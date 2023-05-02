@@ -6,8 +6,8 @@ import org.springframework.http.ResponseEntity;
 
 import com.peterss7.prs.entities.Request;
 import org.springframework.data.jpa.domain.Specification;
-import com.peterss7.prs.entities.dtos.NewRequestObject;
-import com.peterss7.prs.entities.dtos.UserRequestObject;
+import com.peterss7.prs.entities.dtos.NewRequest;
+import com.peterss7.prs.entities.dtos.UserRequest;
 
 public interface IRequestService {
 	public abstract List<Request> findAllRequests();
@@ -19,7 +19,7 @@ public interface IRequestService {
 		String status, double total, UserRequestObject userRequestObject);
 	*/
 	public abstract List<Request> findRequestsByFields(Specification<Request> specs);
-	public abstract Request createRequest(NewRequestObject newRequestObject);
+	public abstract Request createRequest(NewRequest newRequestObject);
 	public abstract ResponseEntity<Void> updateRequest(Request updatedRequest);
 	public abstract ResponseEntity<Void> deleteRequestById(int id);
 	public abstract ResponseEntity<Void> deleteRequestsByFields(

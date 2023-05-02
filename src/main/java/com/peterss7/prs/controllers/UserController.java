@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,19 +22,25 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.peterss7.prs.entities.User;
+import com.peterss7.prs.entities.dtos.user.UserAuthenticated;
+import com.peterss7.prs.entities.dtos.user.UserSecureView;
+import com.peterss7.prs.entities.dtos.user.UserCredentials;
 import com.peterss7.prs.services.UserService;
 import com.peterss7.prs.specifications.UserSpecifications;
 
 @RestController
 @RequestMapping("/users")
-
+@CrossOrigin("http://localhost:4200")
 public class UserController {
+	
+	private static final Logger LOGGER = LoggerFactory.getLogger(UserController.class);
 	
 	@Autowired
 	private UserService userService;
 	
 	@GetMapping("")
-	public ResponseEntity<List<User>> findUserByFields(
+	public ResponseEntity<List<UserSecureView>> findUserByFields(
+			
 			@RequestParam(required = false) String username,
 			@RequestParam(required = false) String firstname,
 			@RequestParam(required = false) String lastname,
@@ -40,6 +48,8 @@ public class UserController {
 			@RequestParam(required = false) String email,
 			@RequestParam(required = false) Boolean isReviewer,
 			@RequestParam(required = false) Boolean isAdmin){
+		
+		List<UserSecureView> usersSecure = new ArrayList<>();
 		
 		try {
 			
@@ -51,9 +61,13 @@ public class UserController {
 				(isReviewer == null)&&
 				(isAdmin == null)){
 				
-				List<User> users = userService.findAllUsers(); 
+				List<User> users = userService.findAllUsers();
 				
-				return ResponseEntity.ok(users);
+				for (User user : users) {
+					usersSecure.add(new UserSecureView(user));
+				}
+				
+				return ResponseEntity.ok(usersSecure);
 				
 			} else{
 				
@@ -71,10 +85,14 @@ public class UserController {
 						UserSpecifications.getUserSpecs(searchTerm));
 				
 				if (users == null) {
-					return new ResponseEntity<List<User>>(users, HttpStatus.NOT_FOUND);
+					return new ResponseEntity<List<UserSecureView>>(usersSecure, HttpStatus.NOT_FOUND);
 				}
 				
-				return ResponseEntity.ok(users);
+				for (User user : users) {
+					usersSecure.add(new UserSecureView(user));
+				}
+				
+				return ResponseEntity.ok(usersSecure);
 				
 			}	
 		} catch (Exception e) {
@@ -83,78 +101,68 @@ public class UserController {
 	}
 	
 	@GetMapping("/{id}")
-	public ResponseEntity<User> findUserById(@PathVariable int id){
+	public ResponseEntity<UserSecureView> findUserById(@PathVariable int id){
 		try {
+			
+			/*
+			
 			User user = userService.findUserById(id);
-			return new ResponseEntity<User>(user, HttpStatus.OK);
+			
+			UserSecureView userSecure = new UserSecureView(user);
+			
+			return new ResponseEntity<UserSecureView>(userSecure, HttpStatus.OK);
+			*/
+			
+			return userService.findUserById(id);
+			
 		}catch (Exception e) {
-			return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 		
 	}
 	
 	@PostMapping("")
-	public ResponseEntity<User> createUser(@RequestBody User newUser){	
+	public ResponseEntity<UserSecureView> createUser(@RequestBody User newUser){	
 		newUser.toString();
-		try {
-			User user = userService.createUser(newUser);
-			return new ResponseEntity<>(user, HttpStatus.CREATED);
+		try {			
+			return userService.createUser(newUser);
 		}catch(Exception e) {
 			e.printStackTrace();
 			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
-		}
-		
+		}		
 	}
+	
+	@ResponseBody
+	@PostMapping("/login")
+	public ResponseEntity<UserAuthenticated> userLogin(@RequestBody UserCredentials credentials){
+		
+	    try {
+	    	
+	        UserAuthenticated authenticatedUser = userService.authenticate(credentials);
+	        
+	        if (authenticatedUser != null) {
+	            return new ResponseEntity<UserAuthenticated>(authenticatedUser, HttpStatus.OK);    
+	        } else {
+	            return new ResponseEntity<UserAuthenticated>(HttpStatus.NOT_FOUND);
+	        }
+	    } catch(Exception e) {
+	        e.printStackTrace();
+	        return new ResponseEntity<UserAuthenticated>(HttpStatus.INTERNAL_SERVER_ERROR);
+	    }
+	}
+
 
 	@PutMapping("/{id}")
 	@ResponseBody
-	public ResponseEntity<User> updateUser(@RequestBody User updatedUser){
-		return ResponseEntity.ok(userService.updateUser(updatedUser));
+	public ResponseEntity<String> updateUser(@RequestBody User updatedUser){
+		
+        //LOGGER.warn("UserController updateUser put called.");        
+		
+		return userService.updateUser(updatedUser);
 	}
-	
-
-	
+		
 	@DeleteMapping("/{id}")
-	public ResponseEntity<Void> deleteUserById(@PathVariable int id){
+	public ResponseEntity<String> deleteUserById(@PathVariable int id){
 		return userService.deleteUserById(id);
 	}
-	
-	/*
-	@DeleteMapping("")
-	public ResponseEntity<Void> deleteUserByFields(
-			@RequestParam(required = false) String username,
-			@RequestParam(required = false) String firstname,
-			@RequestParam(required = false) String lastname,
-			@RequestParam(required = false) String phone,
-			@RequestParam(required = false) String email,
-			@RequestParam(required = false) Boolean isReviewer,
-			@RequestParam(required = false) Boolean isAdmin){
-		
-		try {
-			
-			if ((username != null)  || 
-				(firstname != null) ||
-				(lastname != null)  ||
-				(phone != null)     ||
-				(email != null)     ||
-				(isReviewer != null)||
-				(isAdmin != null)){
-				
-				 
-				
-				return userService.deleteUsersByFields(
-							username, firstname, lastname, 
-							phone, email, isReviewer, isAdmin);
-			}
-			else {
-				return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
-			}
-				
-			
-		} catch (Exception e) {
-			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
-		}				
-	}
-	*/
-	
 }

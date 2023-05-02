@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 
 import com.peterss7.prs.entities.Product;
-import com.peterss7.prs.entities.dtos.ProductCreateObject;
+import com.peterss7.prs.entities.dtos.ProductCreate;
 import com.peterss7.prs.repositories.ProductRepository;
 
 import com.peterss7.prs.services.ProductService;
@@ -85,7 +85,7 @@ public class ProductController {
 	}
 	
 	@PostMapping("")
-	public ResponseEntity<Product> createProduct(@RequestBody ProductCreateObject newProduct){		
+	public ResponseEntity<Product> createProduct(@RequestBody ProductCreate newProduct){		
 		try {
 			Product product = productService.createProduct(newProduct);
 			return new ResponseEntity<>(product, HttpStatus.CREATED);

@@ -19,13 +19,13 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.peterss7.prs.entities.Request;
 
-import com.peterss7.prs.entities.dtos.NewRequestObject;
+import com.peterss7.prs.entities.dtos.NewRequest;
 import com.peterss7.prs.repositories.RequestRepository;
 import com.peterss7.prs.services.RequestService;
 
 @RestController
 @RequestMapping("/requests")
-@CrossOrigin("http://localhost:8080")
+@CrossOrigin("http://localhost:4200")
 public class RequestController {
 	
 	@Autowired
@@ -55,7 +55,7 @@ public class RequestController {
 	*/
 	
 	@PostMapping("")
-	public ResponseEntity<Request> createRequest(@RequestBody NewRequestObject newRequest){		
+	public ResponseEntity<Request> createRequest(@RequestBody NewRequest newRequest){		
 		try {
 			Request request = requestService.createRequest(newRequest);
 			return new ResponseEntity<>(request, HttpStatus.CREATED);

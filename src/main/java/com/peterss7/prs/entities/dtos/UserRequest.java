@@ -2,10 +2,12 @@ package com.peterss7.prs.entities.dtos;
 
 import com.peterss7.prs.entities.User;
 
-public class UserRequestObject {
+public class UserRequest {
+	
 	private int id;
 	private String firstName;
 	private String lastName;
+	
 	@Override
 	public String toString() {
 		return "UserRequestObject [id=" + id + ", firstName=" + firstName + ", lastName=" + lastName + "]";
@@ -22,7 +24,7 @@ public class UserRequestObject {
 	public void setFirstName(String firstName) {
 		this.firstName = firstName;
 	}
-	public UserRequestObject(int id, String firstName, String lastName) {
+	public UserRequest(int id, String firstName, String lastName) {
 		super();
 		this.id = id;
 		this.firstName = firstName;
@@ -35,7 +37,7 @@ public class UserRequestObject {
 		this.lastName = lastName;
 	}
 	
-	public UserRequestObject getUserRequestObject(User user) {
-		return new UserRequestObject(user.getId(), user.getFirstname(), user.getLastname());
+	public UserRequest getUserRequestObject(User user) {
+		return new UserRequest(user.getId(), user.getFirstname(), user.getLastname());
 	}
 }

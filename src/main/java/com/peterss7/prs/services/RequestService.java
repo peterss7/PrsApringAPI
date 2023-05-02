@@ -15,7 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import com.peterss7.prs.entities.Request;
-import com.peterss7.prs.entities.dtos.NewRequestObject;
+import com.peterss7.prs.entities.dtos.NewRequest;
 import com.peterss7.prs.repositories.RequestRepository;
 import com.peterss7.prs.specifications.RequestSpecifications;
 
@@ -61,7 +61,7 @@ public class RequestService implements IRequestService{
 	}
 	
 	@Override
-	public Request createRequest(NewRequestObject newRequestObject) {
+	public Request createRequest(NewRequest newRequestObject) {
 		
 		Request newRequest = new Request();
 		DateTimeFormatter requestDateFormatter = DateTimeFormatter.ofPattern("MM/dd/yyyy");

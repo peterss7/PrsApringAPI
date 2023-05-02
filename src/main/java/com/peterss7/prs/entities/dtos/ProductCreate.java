@@ -1,6 +1,6 @@
 package com.peterss7.prs.entities.dtos;
 
-public class ProductCreateObject {
+public class ProductCreate {
 
 	private String partNumber;
 	private String name;
@@ -44,7 +44,7 @@ public class ProductCreateObject {
 	public void setVendorId(int vendorId) {
 		this.vendorId = vendorId;
 	}
-	public ProductCreateObject(String partNumber, String name, double price, String unit, String photopath,
+	public ProductCreate(String partNumber, String name, double price, String unit, String photopath,
 			int vendorId) {
 		super();
 		this.partNumber = partNumber;

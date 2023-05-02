@@ -4,7 +4,7 @@ import java.sql.Date;
 
 import com.peterss7.prs.entities.Request;
 
-public class NewRequestObject {
+public class NewRequest {
 	public String description;
 	public String justification;
 	public String rejectionReason;
@@ -22,7 +22,7 @@ public class NewRequestObject {
 	
 	public int userId;
 	
-	public NewRequestObject(String description, String justification, String rejectionReason, String dateNeeded,
+	public NewRequest(String description, String justification, String rejectionReason, String dateNeeded,
 			int userId) {
 		super();
 		this.description = description;
@@ -32,8 +32,8 @@ public class NewRequestObject {
 		this.userId = userId;
 	}
 	
-	public NewRequestObject getNewRequestObject(Request newRequest) {
-		return new NewRequestObject(newRequest.getDescription(), newRequest.getJustification(),
+	public NewRequest getNewRequestObject(Request newRequest) {
+		return new NewRequest(newRequest.getDescription(), newRequest.getJustification(),
 				newRequest.getRejectionReason(), newRequest.getDateNeeded(), newRequest.getUser().getId());
 	}
 	

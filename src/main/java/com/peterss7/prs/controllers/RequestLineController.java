@@ -18,7 +18,7 @@ import com.peterss7.prs.repositories.RequestLineRepository;
 
 @RestController
 @RequestMapping("/requestlines")
-@CrossOrigin("http://localhost:8080")
+@CrossOrigin("http://localhost:4200")
 public class RequestLineController {
 	
 	@Autowired

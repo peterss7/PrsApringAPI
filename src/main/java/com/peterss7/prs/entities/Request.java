@@ -10,7 +10,7 @@ import org.springframework.core.annotation.Order;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-import com.peterss7.prs.entities.dtos.UserRequestObject;
+import com.peterss7.prs.entities.dtos.UserRequest;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -100,9 +100,9 @@ public class Request {
 		return status;
 	}
 
-	public UserRequestObject getUser() {
+	public UserRequest getUser() {
 		
-		return new UserRequestObject(user.getId(), user.getFirstname(), user.getLastname());
+		return new UserRequest(user.getId(), user.getFirstname(), user.getLastname());
 	}
 
 	public Request() {		

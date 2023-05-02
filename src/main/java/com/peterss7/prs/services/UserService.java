@@ -2,9 +2,13 @@ package com.peterss7.prs.services;
 
 
 import java.util.ArrayList;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 import java.util.List;
 import java.util.Optional;
-
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
@@ -12,13 +16,17 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import com.peterss7.prs.entities.User;
+import com.peterss7.prs.entities.dtos.user.UserAuthenticated;
+import com.peterss7.prs.entities.dtos.user.UserSecureView;
+import com.peterss7.prs.entities.dtos.user.UserCredentials;
 import com.peterss7.prs.repositories.UserRepository;
 import com.peterss7.prs.specifications.UserSpecifications;
 
 @Service
-public class UserService implements IUserService{
+public class UserService implements IUserService{	
 
 	private final UserRepository userRepository;
+	private static final Logger LOGGER = LoggerFactory.getLogger(UserService.class);
 	
 	public UserService(UserRepository userRepository) {
 		this.userRepository = userRepository;
@@ -30,16 +38,26 @@ public class UserService implements IUserService{
 	}
 	
 	@Override 
-	public User findUserById(int id) {
+	public ResponseEntity<UserSecureView> findUserById(int id) {
 		User user = new User();
 		
 		Optional<User> optionalUser = userRepository.findById(id);
 		
 		if (optionalUser.isPresent()) {
+			
 			user = optionalUser.get();
+			
+			UserSecureView userSecure = new UserSecureView(user);
+			
+			return new ResponseEntity<UserSecureView>(userSecure, HttpStatus.OK);
+			
 		}
 		
-		return user;
+		else {
+			return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+		}
+		
+		
 	}
 	
 	@Override
@@ -55,136 +73,225 @@ public class UserService implements IUserService{
 		
 		return users;
 	}
-	/*
+	
 	@Override
-	public List<User> findUsersByFields(String username, String firstname, String lastname,
-		String phone, String email, Boolean isReviewer, Boolean isAdmin){
+	public UserAuthenticated authenticate(UserCredentials credentials) {
 		
-		Specification<User> spec = Specification.where(null);
+		User authenticatingUser = new User();
+		UserAuthenticated authenticatedUser = new UserAuthenticated();
 		
-		if (username != null) {
-			System.out.println("username is: " + username);
-			spec = spec.and(UserSpecifications.usernameLike(username));
-		}
-		if (firstname != null) {
-			System.out.println("first name is: " + firstname);
-			spec = spec.and(UserSpecifications.firstnameLike(firstname));
-		}
-		if (lastname != null) {
-			spec = spec.and(UserSpecifications.lastnameLike(lastname));
-		}
-		if (phone != null) {
-			spec = spec.and(UserSpecifications.phoneLike(phone));
-		}
-		if (email != null) {
-			spec = spec.and(UserSpecifications.emailLike(email));
-		}
-		if (isReviewer != null) {
-			spec = spec.and(UserSpecifications.isReviewerLike(isReviewer));
-		}
-		if (isReviewer != null) {
-			spec = spec.and(UserSpecifications.isReviewerLike(isReviewer));
-		}
+		authenticatingUser.setUsername(credentials.getUsername());
+		authenticatingUser.setPassword(credentials.getPassword());
 		
-		System.out.println(spec.hashCode());
+		Specification<User> authenticatingSpec = UserSpecifications.getUserSpecs(authenticatingUser);
 		
-		// List<User> users = userRepository.findAll(spec);
-		
-		List<User> users = new ArrayList<User>();
-		
-		Optional<List<User>> optionalUser = userRepository.findAll(spec);
+		Optional<List<User>> optionalUser = userRepository.findAll(authenticatingSpec);
 		
 		if (optionalUser.isPresent()) {
-			users = optionalUser.get();
+			
+			User foundUser = optionalUser.get().get(0);
+			
+			/*
+			if (foundUser.getUsername().equals(credentials.getUsername())
+				&& foundUser.getPassword().equals(credentials.getPassword())) {
+			*/
+				
+				authenticatedUser.setId(foundUser.getId());
+				authenticatedUser.setFirstname(foundUser.getFirstname());
+				authenticatedUser.setLastname(foundUser.getLastname());
+				authenticatedUser.setIsReviewer(foundUser.getIsReviewer());
+				authenticatedUser.setIsAdmin(foundUser.getIsAdmin());
+				
+				return authenticatedUser;
+			// }
 		}
 		else {
 			return null;
 		}
 		
-		
-		return users;
-	}
-	*/
-	@Override
-	public User createUser(User newUser) {	
-		
-		newUser.toString();
-		
-		User savedUser = userRepository.save(newUser);
-		newUser.toString();
-		return savedUser;
 	}
 	
+	
 	@Override
-	public User updateUser(User updatedUser) {
+	public ResponseEntity<UserSecureView> createUser(User newUser) {	
 		
-		User user = new User();
+		newUser.toString();
 		
-		Optional<User> optionalUser = userRepository.findById(updatedUser.getId());
+		// Optional<List<User>> optionalUser = userRepository.findAll(UserSpecifications.getUserSpecs(newUser));
 		
-		if (optionalUser.isPresent()) {
-			user = userRepository.save(updatedUser);
+		Optional<User> optionalUser = userRepository.findByUsername(newUser.getUsername());
+		
+		try {
+			if (optionalUser.isPresent()) {
+				return new ResponseEntity<>(null,HttpStatus.CONFLICT);
+			}
+		}
+		catch(Exception e) {
+			e.printStackTrace();
+			return new ResponseEntity<>(null,HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 		
-		return user;				
+		String validity = validateUserValues(newUser);
+		
+		if (!validity.equals("OK")) {			
+			UserSecureView errorUser = new UserSecureView(validity);			
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorUser);
+		}
+		
+		UserSecureView createdUser = new UserSecureView(userRepository.save(newUser));
+		
+		return ResponseEntity.status(HttpStatus.OK).body(createdUser);
 	}
 	
 	@Override
-	public ResponseEntity<Void> deleteUserById(int id) {		
+	public ResponseEntity<String> updateUser(User updatedUser) {
+		
+        String validity = validateUserValues(updatedUser);
+        
+        if (!validity.equals("OK")) {
+        	return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(validity);
+        }
+        
+		LOGGER.warn("Entering UserService userUpdate with id: " + updatedUser.getId() + ": " + updatedUser.getFirstname());
+		
+		try {
+        
+	        Optional<User> optionalUser = userRepository.findById(updatedUser.getId());
+	        
+	        if (optionalUser.isPresent()) {
+	        	
+	        	User targetUser = optionalUser.get();
+	        	
+	        	if (updatedUser.getUsername() != null) {
+	    			targetUser.setUsername(updatedUser.getUsername());
+	    		}    		
+	    		if (updatedUser.getPassword()!= null) {
+	    			targetUser.setPassword(updatedUser.getPassword());
+	    		}    		
+	    		if (updatedUser.getFirstname()!= null) {
+	    			targetUser.setFirstname(updatedUser.getFirstname());
+	    		}    		
+	    		if (updatedUser.getLastname()!= null) {
+	    			targetUser.setLastname(updatedUser.getLastname());
+	    		}    		
+	    		if (updatedUser.getPhone()!= null) {
+	    			targetUser.setPhone(updatedUser.getPhone());
+	    		}    		
+	    		if (updatedUser.getEmail()!= null) {
+	    			targetUser.setEmail(updatedUser.getEmail());
+	    		}    		
+	    		if (updatedUser.getIsReviewer()!= null) {
+	    			targetUser.setIsReviewer(updatedUser.getIsReviewer());
+	    		}    		
+	    		if (updatedUser.getIsAdmin()!= null) {
+	    			targetUser.setIsAdmin(updatedUser.getIsAdmin());
+	    		}
+	    		
+	    		userRepository.save(targetUser);
+	    		
+	    		return ResponseEntity.status(HttpStatus.OK).body(null);
+	        }				
+	        else {
+	        	return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+	        }
+		} catch (Exception e) {
+			e.printStackTrace();
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+		}
+		
+	}
+	
+	@Override
+	public ResponseEntity<String> deleteUserById(int id) {		
 		
 		Optional<User> optionalUser = userRepository.findById(id);
 		
 		if (!optionalUser.isPresent()) {
-			return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
-		}
-		
-		return new ResponseEntity<>(null, HttpStatus.NO_CONTENT);
-	}
-	
-	@Override
-	public ResponseEntity<Void> deleteUsersByFields(String username, String firstname, String lastname,
-		String phone, String email, Boolean isReviewer, Boolean isAdmin){
-		
-		Specification<User> spec = Specification.where(null);
-		
-		if (username != null) {
-			System.out.println("username is: " + username);
-			spec = spec.and(UserSpecifications.usernameLike(username));
-		}
-		if (firstname != null) {
-			System.out.println("first name is: " + firstname);
-			spec = spec.and(UserSpecifications.firstnameLike(firstname));
-		}
-		if (lastname != null) {
-			spec = spec.and(UserSpecifications.lastnameLike(lastname));
-		}
-		if (phone != null) {
-			spec = spec.and(UserSpecifications.phoneLike(phone));
-		}
-		if (email != null) {
-			spec = spec.and(UserSpecifications.emailLike(email));
-		}
-		if (isReviewer != null) {
-			spec = spec.and(UserSpecifications.isReviewerLike(isReviewer));
-		}
-		if (isReviewer != null) {
-			spec = spec.and(UserSpecifications.isReviewerLike(isReviewer));
-		}
-
-		List<User> deleteUser = new ArrayList<User>();
-		Optional<List<User>> optionalUser = userRepository.findAll(spec);
-		
-		
-		if (optionalUser.isPresent()) {
-			deleteUser = optionalUser.get();
-			return new ResponseEntity<>(null, HttpStatus.NO_CONTENT);
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body("USER NOT FOUND");
 		}
 		else {
-			return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+			userRepository.deleteById(id);
+			return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
 		}
+		
 	}
 
-
-
-
+	@Override
+	public String validateUserValues(User user) {
+		
+		if (user.getUsername() != null) {
+			
+			if (user.getUsername().length() > 30) {
+				return "INVALID: USERNAME TOO LONG";
+			}
+			
+			Pattern usernamePattern1 = Pattern.compile("[A-Za-z]+[0-9]+");
+			Pattern usernamePattern2 = Pattern.compile("[A-Za-z]+[0-9]+[A-Za-z]+");
+			
+			Matcher matcher1 = usernamePattern1.matcher(user.getUsername());
+			Matcher matcher2 = usernamePattern2.matcher(user.getUsername());
+			
+			if (!matcher1.matches() && !matcher2.matches()) {
+				return "INVALID: INCORRECT USERNAME FORMAT";
+			}			
+		}
+		if (user.getPassword() != null) {
+			if (user.getPassword().length() > 30) {
+				return "INVALID: PASSWORD TOO LONG";
+			}
+			
+			Pattern passwordPattern = Pattern.compile("(?=.*[A-Z])(?=.*\\d)(?=.*[!@#\\$%\\^&\\*\\(\\)\\+-])[A-Za-z\\d!@#\\$%\\^&\\*\\(\\)\\+-]+$");
+			Matcher passwordMatcher = passwordPattern.matcher(user.getPassword());
+			
+			if (!passwordMatcher.matches()) {
+				return "INVALID: INCORRECT PASSWORD FORMAT";
+			}
+		}
+		if (user.getFirstname() != null) {
+			if (user.getFirstname().length() > 30) {
+				return "INVALID: FIRSTNAME TOO LONG";
+			}
+			
+			Pattern firstnamePattern = Pattern.compile("^[A-Za-z]+$");
+			Matcher firstnameMatcher = firstnamePattern.matcher(user.getFirstname());
+			
+			if (!firstnameMatcher.matches()) {
+				return "INVALID: FIRSTNAME CAN ONLY CONTAIN LETTERS";
+			}
+			
+		}
+		if (user.getLastname() != null) {
+			if (user.getLastname().length() > 30) {
+				return "INVALID: LASTNAME TOO LONG";
+			}
+			
+			Pattern lastnamePattern = Pattern.compile("^[A-Za-z]+$");
+			Matcher lastnameMatcher = lastnamePattern.matcher(user.getLastname());
+			
+			if (!lastnameMatcher.matches()) {
+				return "INVALID: LASTNAME CAN ONLY CONTAIN LETTERS";
+			}
+			
+		}
+		if (user.getPhone() != null) {
+			Pattern phonePattern = Pattern.compile("[1-9]{3}-[0-9]{3}-[0-9]{4}$");
+			Matcher phoneMatcher = phonePattern.matcher(user.getPhone());
+			
+			if (!phoneMatcher.matches()) {
+				return "INVALID: INCORRECT PHONE NUMBER FORMAT";
+			}
+		}
+		if (user.getEmail() != null) {
+			
+			Pattern emailPattern = Pattern.compile("^[A-Za-z\\d]+\\.?[A-Za-z\\d]+@[A-Za-z]+\\.[A-Za-z]+$");
+			Matcher emailMatcher = emailPattern.matcher(user.getEmail());
+			
+			if (!emailMatcher.matches()) {
+				return "INVALID: INCORRECT EMAIL FORMAT";
+			}
+		}
+		
+		return "OK";
+		
+	}
 }

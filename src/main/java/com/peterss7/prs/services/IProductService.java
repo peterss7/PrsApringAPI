@@ -8,7 +8,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.ResponseEntity;
 import com.peterss7.prs.entities.Product;
 import com.peterss7.prs.entities.Vendor;
-import com.peterss7.prs.entities.dtos.ProductCreateObject;
+import com.peterss7.prs.entities.dtos.ProductCreate;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.GeneratedValue;
@@ -32,6 +32,6 @@ public interface IProductService {
 	public abstract ResponseEntity<Void> deleteProductsByFields(
 			String partNumber, String name, Double price,
 			String unit, String photoPath, Integer vendorId);
-	Product createProduct(ProductCreateObject newProduct);
+	Product createProduct(ProductCreate newProduct);
 	
 }

@@ -11,7 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import com.peterss7.prs.entities.Product;
-import com.peterss7.prs.entities.dtos.ProductCreateObject;
+import com.peterss7.prs.entities.dtos.ProductCreate;
 import com.peterss7.prs.repositories.ProductRepository;
 import com.peterss7.prs.specifications.ProductSpecifications;
 
@@ -108,7 +108,7 @@ public class ProductService implements IProductService{
 	}
 	
 	@Override
-	public Product createProduct(ProductCreateObject newProductObject) {
+	public Product createProduct(ProductCreate newProductObject) {
 		
 		Product newProduct = new Product();
 		
