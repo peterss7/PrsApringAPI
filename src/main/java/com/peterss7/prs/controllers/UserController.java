@@ -73,13 +73,29 @@ public class UserController {
 				
 				User searchTerm = new User();
 				
-				searchTerm.setFirstname(firstname);
-				searchTerm.setLastname(lastname);
-				searchTerm.setUsername(username);
-				searchTerm.setPhone(phone);
-				searchTerm.setEmail(email);
-				searchTerm.setIsReviewer(isReviewer);
-				searchTerm.setIsAdmin(isAdmin);
+				if (firstname != null) {
+					searchTerm.setFirstname(firstname);
+				}
+				if (lastname != null) {
+					searchTerm.setLastname(lastname);
+				}
+				if (username != null) {
+					searchTerm.setUsername(username);
+				}
+				if (phone != null) {
+					searchTerm.setPhone(phone);
+				}
+				if (email != null) {
+					searchTerm.setEmail(email);
+				}
+				if (isReviewer != null) {
+					searchTerm.setIsReviewer(isReviewer);
+				}
+				if (isAdmin != null) {
+					searchTerm.setIsAdmin(isAdmin);
+				}
+				
+				LOGGER.warn("Inside userController find by fields with firstname: " + searchTerm.getFirstname());
 				
 				List<User> users = userService.findUsersByFields(
 						UserSpecifications.getUserSpecs(searchTerm));
@@ -96,6 +112,7 @@ public class UserController {
 				
 			}	
 		} catch (Exception e) {
+			e.printStackTrace();
 			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
 		}				
 	}

@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.peterss7.prs.entities.Vendor;
 import com.peterss7.prs.services.VendorService;
+import com.peterss7.prs.specifications.VendorSpecifications;
 
 
 
@@ -58,9 +59,37 @@ public class VendorController {
 				return ResponseEntity.ok(vendors);
 				
 			} else{
+				
+				Vendor searchTerm = new Vendor();
+				
+				if (code != null) {
+					searchTerm.setCode(code);	
+				}
+				if (name != null) {
+					searchTerm.setName(name);	
+				}
+				if (address != null) {
+					searchTerm.setAddress(address);	
+				}				
+				if (city != null) {
+					searchTerm.setCity(city);	
+				}
+				if (state != null) {
+					searchTerm.setState(state);	
+				}
+				if (zip != null) {
+					searchTerm.setZip(zip);	
+				}
+				if (phone != null) {
+					searchTerm.setPhone(phone);	
+				}
+				if (email != null) {
+					searchTerm.setEmail(email);	
+				}
+				
+				
 				List<Vendor> vendors = vendorService.findVendorsByFields(
-						code, name, address,city,
-						state, zip, phone, email);
+					VendorSpecifications.getVendorSpecs(searchTerm));
 				
 				return ResponseEntity.ok(vendors);
 				
@@ -103,44 +132,5 @@ public class VendorController {
 	@DeleteMapping("/{id}")
 	public ResponseEntity<Void> deleteVendor(@PathVariable int id){
 		return vendorService.deleteVendorById(id);
-	}
-	
-	@DeleteMapping("")
-	public ResponseEntity<Void> deleteVendorsByFields(
-			@RequestParam(required = false) String code,
-			@RequestParam(required = false) String name,
-			@RequestParam(required = false) String address,
-			@RequestParam(required = false) String city,
-			@RequestParam(required = false) String state,
-			@RequestParam(required = false) String zip,
-			@RequestParam(required = false) String phone,
-			@RequestParam(required = false) String email){
-		
-		try {
-			
-			if ((code != null)  || 
-				(name != null) ||
-				(address != null)  ||
-				(phone != null)     ||
-				(email != null)     ||
-				(city != null)||
-				(state != null)){
-				
-				 
-				
-				return vendorService.deleteVendorsByFields(
-							code, name, address, 
-							city, state, zip,phone, email);
-			}
-			else {
-				return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
-			}
-				
-			
-		} catch (Exception e) {
-			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
-		}				
-	}
-	
-	
+	}	
 }

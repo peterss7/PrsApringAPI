@@ -1,6 +1,7 @@
 package com.peterss7.prs.services;
 
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -9,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import com.peterss7.prs.entities.User;
 import com.peterss7.prs.entities.Vendor;
 import com.peterss7.prs.repositories.VendorRepository;
 import com.peterss7.prs.specifications.VendorSpecifications;
@@ -38,20 +40,6 @@ public class VendorService implements IVendorService{
 		}
 		
 		return vendor;
-	}
-	
-	@Override
-	public List<Vendor> findVendorsByFields(
-			String code, String name, String address,
-			String city, String state, String zip, 
-			String phone, String email){
-		
-		Specification<Vendor> spec = createSpecs(code, name, address, 
-				city, state, zip, phone, email);
-		
-		List<Vendor> vendors = vendorRepository.findAll(spec);
-		
-		return vendors;
 	}
 	
 	@Override
@@ -87,67 +75,23 @@ public class VendorService implements IVendorService{
 	}
 	
 	
-	
 	@Override
-	public ResponseEntity<Void> deleteVendorsByFields(String code, String name, String address,
-		String city, String state, String zip, String phone, String email){
+	public List<Vendor> findVendorsByFields(Specification<Vendor> spec) {
 		
-		Specification<Vendor> spec = createSpecs(code, name, address, 
-				city, state, zip, phone, email);
+	List<Vendor> vendors = new ArrayList<Vendor>();
 		
-		List<Vendor> deleteVendors = vendorRepository.findAll(spec);
+		Optional<List<Vendor>> optionalVendor = vendorRepository.findAll(spec);
 		
-		boolean isNotNull = false;
-		
-		for (Vendor vendor : deleteVendors) {
-			if (vendor != null) {
-				vendorRepository.delete(vendor);
-				isNotNull = true;
-			}
+		if (optionalVendor.isPresent()) {
+			vendors = optionalVendor.get();
 		}
 		
-		if (isNotNull) {
-			return new ResponseEntity<>(null, HttpStatus.NO_CONTENT);	
-		}
-		else {
-			return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
-		}
+		return vendors;
 	}
-	
-	public Specification<Vendor> createSpecs(String code, String name, String address,
-			String city, String state, String zip, String phone,
-			String email){
 
-		Specification<Vendor> spec = Specification.where(null);
-		
-		if (code != null) {			
-			spec = spec.and(VendorSpecifications.codeLike(code));
-		}
-		if (name != null) {
-			System.out.println("first name is: " + name);
-			spec = spec.and(VendorSpecifications.nameLike(name));
-		}
-		if (address != null) {
-			spec = spec.and(VendorSpecifications.addressLike(address));
-		}
-		if (city != null) {
-			spec = spec.and(VendorSpecifications.cityLike(city));
-		}
-		if (state != null) {
-			spec = spec.and(VendorSpecifications.stateLike(state));
-		}
-		if (zip != null) {
-			spec = spec.and(VendorSpecifications.zipLike(zip));
-		}
-		if (phone != null) {
-			spec = spec.and(VendorSpecifications.phoneLike(phone));
-		}
-		if (email != null) {
-			spec = spec.and(VendorSpecifications.emailLike(email));
-		}
-		
-		return spec;
-		
-				
+	@Override
+	public String validateVendorValues(Vendor vendor) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

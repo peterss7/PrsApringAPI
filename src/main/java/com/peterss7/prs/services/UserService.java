@@ -65,10 +65,10 @@ public class UserService implements IUserService{
 		
 		List<User> users = new ArrayList<User>();
 		
-		Optional<List<User>> optionalUser = userRepository.findAll(spec);
+		Optional<List<User>> optionalUsers = userRepository.findAll(spec);
 		
-		if (optionalUser.isPresent()) {
-			users = optionalUser.get();
+		if (optionalUsers.isPresent()) {
+			users = optionalUsers.get();
 		}
 		
 		return users;
