@@ -17,7 +17,7 @@ public interface IVendorService {
 	public abstract List<Vendor> findVendorsByFields(Specification<Vendor> spec);
 	public abstract Vendor createVendor(Vendor newVendor);
 	public abstract Vendor updateVendor(Vendor updatedVendor);
-	public abstract ResponseEntity<Void> deleteVendorById(int id);
+	public abstract ResponseEntity<String> deleteVendorById(int id);
 	public abstract String validateVendorValues(Vendor vendor);
 	
 }

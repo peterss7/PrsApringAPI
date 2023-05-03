@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.peterss7.prs.entities.Product;
 import com.peterss7.prs.entities.dtos.ProductCreate;
+import com.peterss7.prs.entities.product.ProductResponseDefault;
 import com.peterss7.prs.repositories.ProductRepository;
 
 import com.peterss7.prs.services.ProductService;
@@ -35,7 +36,7 @@ public class ProductController {
 
 	
 	@GetMapping("")
-	public ResponseEntity<List<Product>> findProductsByFields(
+	public ResponseEntity<List<ProductResponseDefault>> findProductsByFields(
 			@RequestParam(required = false) String partNumber,
 			@RequestParam(required = false) String name,
 			@RequestParam(required = false) String unit,
@@ -52,17 +53,17 @@ public class ProductController {
 				(photopath == null)     &&
 				(vendorId == null)){
 				
-				List<Product> products = productService.findAllProducts(); 
+				List<ProductResponseDefault> products = productService.findAllProducts(); 
 				
 				return ResponseEntity.ok(products);
 				
 			} else{
-				List<Product> products = productService.findProductsByFields(
+				List<ProductResponseDefault> products = productService.findProductsByFields(
 						partNumber, name, price,unit,
 						photopath, vendorId);
 				
 				if (products == null) {
-					return new ResponseEntity<List<Product>>(products, HttpStatus.NOT_FOUND);
+					return new ResponseEntity<List<ProductResponseDefault>>(products, HttpStatus.NOT_FOUND);
 				}
 				
 				return ResponseEntity.ok(products);

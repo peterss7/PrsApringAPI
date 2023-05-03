@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 
 import com.peterss7.prs.entities.Product;
 import com.peterss7.prs.entities.dtos.ProductCreate;
+import com.peterss7.prs.entities.product.ProductResponseDefault;
 import com.peterss7.prs.repositories.ProductRepository;
 import com.peterss7.prs.specifications.ProductSpecifications;
 
@@ -29,21 +30,30 @@ public class ProductService implements IProductService{
 	}
 	
 	@Override
-	public List<Product> findAllProducts(){
-		return productRepository.findAll();
+	public List<ProductResponseDefault> findAllProducts(){
+		
+		List<Product> products = productRepository.findAll();
+		List<ProductResponseDefault> productResponses = new ArrayList<ProductResponseDefault>();
+		
+		for (Product product : products) {
+			productResponses.add(new ProductResponseDefault(product));
+		}
+		
+		return productResponses;
 	}
 	
 	@Override 
 	public Product findProductById(int id) {
-		Product product = new Product();
 		
 		Optional<Product> optionalProduct = productRepository.findById(id);
 		
 		if (optionalProduct.isPresent()) {
-			product = optionalProduct.get();
+			return optionalProduct.get();
+		}
+		else {
+			return null;
 		}
 		
-		return product;
 	}
 	
 	@Override
@@ -61,7 +71,7 @@ public class ProductService implements IProductService{
 	}
 	
 	@Override
-	public List<Product> findProductsByFields(String partNumber, String name, Double price,
+	public List<ProductResponseDefault> findProductsByFields(String partNumber, String name, Double price,
 		String unit, String photopath, Integer vendorId){
 		
 		Specification<Product> spec = Specification.where(null);
@@ -92,12 +102,15 @@ public class ProductService implements IProductService{
 		
 		// List<Product> products = productRepository.findAll(spec);
 		
-		List<Product> products = new ArrayList<Product>();
+		List<ProductResponseDefault> products = new ArrayList<ProductResponseDefault>();
 		
 		Optional<List<Product>> optionalProducts = productRepository.findAll(spec);
 		
 		if (optionalProducts.isPresent()) {
-			products = optionalProducts.get();
+			for (Product product : optionalProducts.get()) {
+				products.add(new ProductResponseDefault(product));	
+			}
+			
 		}
 		else {
 			return null;

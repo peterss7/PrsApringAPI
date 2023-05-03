@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.peterss7.prs.entities.Request;
@@ -30,29 +31,27 @@ public class RequestController {
 	
 	@Autowired
 	private RequestService requestService;
-	/*
+	
 	@GetMapping("")
-	public List<Request> findAll(){
+	public ResponseEntity<List<Request>> findAll(
+			@RequestParam(required = false) String deliveryMode,
+			@RequestParam(required = false) String submittedDate,
+			@RequestParam(required = false) String dateNeeded,
+			@RequestParam(required = false) String Status,
+			@RequestParam(required = false) int userId
+			){
 		
-		List<Request> requests = requestService.findAll();
+		List<Request> requests = requestService.findAllRequests();
 		
 		return requests;		
 	}
 	
 	@GetMapping("/{id}")
-	public Request findById(@PathVariable int id) {
+	public ResponseEntity<Request> findById(@PathVariable int id) {	
 		
-		Request request = new Request();
-		Optional<Request> optionalRequest = requestService.findById(id);
-		
-		if (optionalRequest.isPresent()) {
-			request = optionalRequest.get();
-		}
-		
-		return request;
-		
+		return requestService.findRequestById(id);
 	}
-	*/
+	
 	
 	@PostMapping("")
 	public ResponseEntity<Request> createRequest(@RequestBody NewRequest newRequest){		

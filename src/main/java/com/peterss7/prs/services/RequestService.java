@@ -34,16 +34,22 @@ public class RequestService implements IRequestService{
 	}
 	
 	@Override 
-	public Request findRequestById(int id) {
-		Request request = new Request();
+	public ResponseEntity<Request> findRequestById(int id) {
 		
 		Optional<Request> optionalRequest = requestRepository.findById(id);
 		
+		Request request = new Request();
+		
 		if (optionalRequest.isPresent()) {
+			
 			request = optionalRequest.get();
+			
+			return new ResponseEntity<Request>(request, HttpStatus.OK);			
+		}
+		else {
+			return new ResponseEntity<Request>(request, HttpStatus.BAD_REQUEST);
 		}
 		
-		return request;
 	}
 	
 	@Override
@@ -105,51 +111,6 @@ public class RequestService implements IRequestService{
 		return new ResponseEntity<>(null, HttpStatus.NO_CONTENT);
 	}
 	
-	@Override
-	public ResponseEntity<Void> deleteRequestsByFields(String partNumber, String name, Double price,
-		String unit, String photopath, Integer vendorId){
-		
-		Specification<Request> spec = Specification.where(null);
-		
-		/*
-		if (partNumber != null) {
-			System.out.println("partNumber is: " + partNumber);
-			spec = spec.and(RequestSpecifications.partNumberLike(partNumber));
-		}
-		if (name != null) {
-			System.out.println("first name is: " + name);
-			spec = spec.and(RequestSpecifications.nameLike(name));
-		}
-		if (price != null) {
-			spec = spec.and(RequestSpecifications.priceLike(price));
-		}
-		if (unit != null) {
-			spec = spec.and(RequestSpecifications.unitLike(unit));
-		}
-		if (photopath != null) {
-			spec = spec.and(RequestSpecifications.photopathLike(photopath));
-		}
-		if (vendorId != null) {
-			spec = spec.and(RequestSpecifications.vendorIdLike(vendorId));
-		}
-		if (vendorId != null) {
-			spec = spec.and(RequestSpecifications.vendorIdLike(vendorId));
-		}
-
-		List<Request> deleteRequests = new ArrayList<Request>();
-		Optional<List<Request>> optionalRequests = requestRepository.findAll(spec);
-		
-		
-		if (optionalRequests.isPresent()) {
-			deleteRequests = optionalRequests.get();
-			return new ResponseEntity<>(null, HttpStatus.NO_CONTENT);
-		}
-		else {
-			return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
-		}
-		*/
-		return null;
-	}
 
 	@Override
 	public List<Request> getReviews(int userId) {

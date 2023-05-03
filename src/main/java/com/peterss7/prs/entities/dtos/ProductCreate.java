@@ -1,5 +1,7 @@
 package com.peterss7.prs.entities.dtos;
 
+import com.peterss7.prs.entities.Vendor;
+
 public class ProductCreate {
 
 	private String partNumber;
@@ -7,7 +9,8 @@ public class ProductCreate {
 	private double price;
 	private String unit;
 	private String photopath;
-	private int vendorId;
+	private Vendor vendor;
+	
 	public String getPartNumber() {
 		return partNumber;
 	}
@@ -39,20 +42,20 @@ public class ProductCreate {
 		this.photopath = photopath;
 	}
 	public int getVendorId() {
-		return vendorId;
+		return vendor.getId();
 	}
-	public void setVendorId(int vendorId) {
-		this.vendorId = vendorId;
+	public void setVendor(Vendor vendor) {
+		this.vendor = vendor;
 	}
 	public ProductCreate(String partNumber, String name, double price, String unit, String photopath,
-			int vendorId) {
+			Vendor vendor) {
 		super();
 		this.partNumber = partNumber;
 		this.name = name;
 		this.price = price;
 		this.unit = unit;
 		this.photopath = photopath;
-		this.vendorId = vendorId;
+		this.vendor = vendor;
 	} 
 	
 }

@@ -63,15 +63,19 @@ public class VendorService implements IVendorService{
 	}
 	
 	@Override
-	public ResponseEntity<Void> deleteVendorById(int id) {		
+	public ResponseEntity<String> deleteVendorById(int id) {		
 		
 		Optional<Vendor> optionalVendor = vendorRepository.findById(id);
 		
 		if (!optionalVendor.isPresent()) {
-			return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body("VENDOR NOT FOUND");
+		}
+		else {
+			vendorRepository.delete(optionalVendor.get());
+			return ResponseEntity.status(HttpStatus.NO_CONTENT).body("VENDOR DELETED");	
 		}
 		
-		return new ResponseEntity<>(null, HttpStatus.NO_CONTENT);
+		
 	}
 	
 	

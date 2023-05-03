@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import com.peterss7.prs.entities.Product;
 import com.peterss7.prs.entities.Vendor;
 import com.peterss7.prs.entities.dtos.ProductCreate;
+import com.peterss7.prs.entities.product.ProductResponseDefault;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.GeneratedValue;
@@ -19,9 +20,9 @@ import jakarta.persistence.ManyToOne;
 import com.peterss7.prs.entities.Product;
 
 public interface IProductService {
-	public abstract List<Product> findAllProducts();
+	public abstract List<ProductResponseDefault> findAllProducts();
 	public abstract Product findProductById(int id);
-	public abstract List<Product> findProductsByFields(
+	public abstract List<ProductResponseDefault> findProductsByFields(
 			String partNumber, String name, Double price,
 			String unit, String photoPath, Integer vendorId);
 	public abstract List<Product> findProductsByFields(

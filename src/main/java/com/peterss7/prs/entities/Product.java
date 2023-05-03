@@ -3,6 +3,8 @@ package com.peterss7.prs.entities;
 
 
 
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 
@@ -15,6 +17,8 @@ import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "Product")
+@JsonPropertyOrder({"id", "partNumber", "name", "price", "unit", 
+	"photoPath","vendorId"})
 public class Product {
 
 	@Id
@@ -74,12 +78,10 @@ public class Product {
 		this.id = id;
 	}
 	
-	public int getVendor() {
-	    if (vendor != null) {
-	        return this.vendor.getId();
-	    } else {
-	        return 0; // or whatever default value you want to use for a null vendor
-	    }
+	public int getVendorId() {
+
+		return vendor.getId();
+	    
 	}
 
 	public String getPartNumber() {
