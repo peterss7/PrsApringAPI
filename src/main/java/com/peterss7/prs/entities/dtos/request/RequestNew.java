@@ -1,14 +1,15 @@
-package com.peterss7.prs.entities.dtos;
+package com.peterss7.prs.entities.dtos.request;
 
 import java.sql.Date;
+import java.time.LocalDate;
 
 import com.peterss7.prs.entities.Request;
 
-public class NewRequest {
+public class RequestNew {
 	public String description;
 	public String justification;
 	public String rejectionReason;
-	public String dateNeeded;
+	public LocalDate dateNeeded;
 	public String deliveryMode;
 	
 	public String getDeliveryMode() {
@@ -22,7 +23,7 @@ public class NewRequest {
 	
 	public int userId;
 	
-	public NewRequest(String description, String justification, String rejectionReason, String dateNeeded,
+	public RequestNew(String description, String justification, String rejectionReason, LocalDate dateNeeded,
 			int userId) {
 		super();
 		this.description = description;
@@ -32,8 +33,8 @@ public class NewRequest {
 		this.userId = userId;
 	}
 	
-	public NewRequest getNewRequestObject(Request newRequest) {
-		return new NewRequest(newRequest.getDescription(), newRequest.getJustification(),
+	public RequestNew getNewRequestObject(Request newRequest) {
+		return new RequestNew(newRequest.getDescription(), newRequest.getJustification(),
 				newRequest.getRejectionReason(), newRequest.getDateNeeded(), newRequest.getUser().getId());
 	}
 	
@@ -55,10 +56,10 @@ public class NewRequest {
 	public void setRejectionReason(String rejectionReason) {
 		this.rejectionReason = rejectionReason;
 	}
-	public String getDateNeeded() {
+	public LocalDate getDateNeeded() {
 		return dateNeeded;
 	}
-	public void setDateNeeded(String dateNeeded) {
+	public void setDateNeeded(LocalDate dateNeeded) {
 		this.dateNeeded = dateNeeded;
 	}
 	public int getUserId() {

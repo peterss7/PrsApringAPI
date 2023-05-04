@@ -1,12 +1,19 @@
-package com.peterss7.prs.entities.dtos;
+package com.peterss7.prs.entities.dtos.request;
 
 import com.peterss7.prs.entities.User;
 
-public class UserRequest {
+public class RequestDefaultUserComponent {
 	
 	private int id;
 	private String firstName;
 	private String lastName;
+	
+	public RequestDefaultUserComponent(User user) {
+		super();
+		this.id = user.getId();
+		this.firstName = user.getFirstname();
+		this.lastName = user.getLastname();
+	}
 	
 	@Override
 	public String toString() {
@@ -24,20 +31,11 @@ public class UserRequest {
 	public void setFirstName(String firstName) {
 		this.firstName = firstName;
 	}
-	public UserRequest(int id, String firstName, String lastName) {
-		super();
-		this.id = id;
-		this.firstName = firstName;
-		this.lastName = lastName;
-	}
 	public String getLastName() {
 		return lastName;
 	}
 	public void setLastName(String lastName) {
 		this.lastName = lastName;
-	}
+	}	
 	
-	public UserRequest getUserRequestObject(User user) {
-		return new UserRequest(user.getId(), user.getFirstname(), user.getLastname());
-	}
 }

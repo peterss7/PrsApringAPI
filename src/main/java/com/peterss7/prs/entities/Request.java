@@ -1,16 +1,18 @@
 package com.peterss7.prs.entities;
 
 import java.sql.Date;
+import java.text.DateFormat;
 import java.time.LocalDate;
 
 import java.util.List;
 
 import org.springframework.core.annotation.Order;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-import com.peterss7.prs.entities.dtos.UserRequest;
+import com.peterss7.prs.entities.dtos.request.RequestDefaultUserComponent;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -31,8 +33,8 @@ public class Request {
 	@JsonProperty("id")	
 	@Id
 	@Column(name = "Id")
-	@GeneratedValue(strategy = GenerationType.AUTO)
-	private int requestId;	
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Integer id;	
 	@Column(name="Description")
 	private String description;
 	@Column(name="Justification")
@@ -42,13 +44,15 @@ public class Request {
 	@Column(name="DeliveryMode")
 	private String deliveryMode;
 	@Column(name="SubmittedDate")
-	private String submittedDate;
+	@DateTimeFormat(pattern = "yyyy-MM-dd")
+	private LocalDate submittedDate;
 	@Column(name="DateNeeded")
-	private String dateNeeded;
+	@DateTimeFormat(pattern = "yyyy-MM-dd")
+	private LocalDate dateNeeded;
 	@Column(name="Status")
 	private String status;
 	
-	private double total;
+	private Double total;
 	
 	@OneToMany(mappedBy = "request")	
 	private List<RequestLine> requestLines;
@@ -58,15 +62,15 @@ public class Request {
 	@JoinColumn(name = "userId")	
 	private User user;
 	
-	public int getId() {
-		return requestId;
+	public Integer getId() {
+		return id;
 	}
 	
-	public double getTotal() {
+	public Double getTotal() {
 		return total;
 	}
 	
-	public void setTotal(double total) {
+	public void setTotal(Double total) {
 		this.total = total;
 	}
 
@@ -86,11 +90,11 @@ public class Request {
 		return deliveryMode;
 	}
 
-	public String getSubmittedDate() {
+	public LocalDate getSubmittedDate() {
 		return submittedDate;
 	}
 
-	public String getDateNeeded() {
+	public LocalDate getDateNeeded() {
 		return dateNeeded;
 	}
 	
@@ -98,17 +102,23 @@ public class Request {
 
 	public String getStatus() {
 		return status;
+	}	
+	
+	public User getUser() {
+		return user;
 	}
 
-	public UserRequest getUser() {
+	public Request() {	
 		
-		return new UserRequest(user.getId(), user.getFirstname(), user.getLastname());
+		this.deliveryMode = "In-Store Pickup";
+		this.submittedDate = LocalDate.now();
+		this.status = "PENDING";
+		this.total = 0.0;
+		this.rejectionReason = null;
 	}
-
-	public Request() {		
-	}
-	public void setId(int id) {
-		this.requestId = id;
+	
+	public void setId(Integer id) {
+		this.id = id;
 	}
 
 	public void setDescription(String description) {
@@ -127,11 +137,11 @@ public class Request {
 		this.deliveryMode = deliveryMode;
 	}
 
-	public void setSubmittedDate(String submittedDate) {
+	public void setSubmittedDate(LocalDate submittedDate) {
 		this.submittedDate = submittedDate;
 	}
 
-	public void setDateNeeded(String dateNeeded) {
+	public void setDateNeeded(LocalDate dateNeeded) {
 		this.dateNeeded = dateNeeded;
 	}
 
@@ -142,12 +152,14 @@ public class Request {
 	public void setUser(User user) {
 		this.user = user;
 	}
+	
 
 
-	public Request(int id, String description, String justification, String rejectionReason, String deliveryMode,
-			String submittedDate, String dateNeeded, String status, double total, User user) {
+
+	public Request(Integer id, String description, String justification, String rejectionReason, String deliveryMode,
+			LocalDate submittedDate, LocalDate dateNeeded, String status, Double total, User user) {
 		super();
-		this.requestId = id;
+		this.id = id;
 		this.description = description;
 		this.justification = justification;
 		this.rejectionReason = rejectionReason;
@@ -159,6 +171,7 @@ public class Request {
 		this.user = user;
 	}
 
+	
 
 	
 }

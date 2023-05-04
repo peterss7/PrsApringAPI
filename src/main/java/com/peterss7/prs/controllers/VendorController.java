@@ -88,10 +88,8 @@ public class VendorController {
 				}
 				
 				
-				List<Vendor> vendors = vendorService.findVendorsByFields(
+				return vendorService.findVendorsByFields(
 					VendorSpecifications.getVendorSpecs(searchTerm));
-				
-				return ResponseEntity.ok(vendors);
 				
 			}	
 		} catch (Exception e) {
@@ -125,8 +123,8 @@ public class VendorController {
 	}
 
 	@PutMapping("/{id}")
-	public ResponseEntity<Vendor> updateVendor(@RequestBody Vendor updatedVendor){
-		return ResponseEntity.ok(vendorService.updateVendor(updatedVendor));
+	public ResponseEntity<String> updateVendor(@RequestBody Vendor updatedVendor){
+		return vendorService.updateVendor(updatedVendor);
 	}
 	
 	@DeleteMapping("/{id}")

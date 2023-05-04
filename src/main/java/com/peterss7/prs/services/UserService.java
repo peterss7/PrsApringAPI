@@ -55,9 +55,13 @@ public class UserService implements IUserService{
 		
 		else {
 			return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
-		}
+		}	
+	}
+	
+	@Override 
+	public Optional<User> findRawUserById(int id) {
 		
-		
+		return userRepository.findById(id);	
 	}
 	
 	@Override
@@ -133,9 +137,8 @@ public class UserService implements IUserService{
 		
 		String validity = validateUserValues(newUser);
 		
-		if (!validity.equals("OK")) {			
-			UserSecureView errorUser = new UserSecureView(validity);			
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorUser);
+		if (!validity.equals("OK")) {
+			return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
 		}
 		
 		UserSecureView createdUser = new UserSecureView(userRepository.save(newUser));

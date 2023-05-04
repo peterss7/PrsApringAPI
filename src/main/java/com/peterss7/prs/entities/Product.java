@@ -18,23 +18,23 @@ import jakarta.persistence.Table;
 @Entity
 @Table(name = "Product")
 @JsonPropertyOrder({"id", "partNumber", "name", "price", "unit", 
-	"photoPath","vendorId"})
+	"photopath","vendorId"})
 public class Product {
 
 	@Id
 	@Column(name = "Id")
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private int id;	
+	private Integer id;	
 	@Column(name="PartNumber")	
 	private String partNumber;
 	@Column(name = "Name")
 	private String name;
 	@Column(name="Price")
-	private double price;
+	private Double price;
 	@Column(name="Unit")
 	private String unit;
 	@Column(name="PhotoPath")
-	private String photoPath;
+	private String photopath;
 	
 	
 	@ManyToOne
@@ -46,7 +46,7 @@ public class Product {
 	
 	
 		
-	public int getId() {
+	public Integer getId() {
 		return id;
 	}
 
@@ -55,13 +55,13 @@ public class Product {
 		
 	}
 
-	public Product(String partNumber, String name, double price, String unit, String photoPath, Vendor vendor, int id) {
+	public Product(String partNumber, String name, Double price, String unit, String photopath, Vendor vendor, Integer id) {
 		super();
 		this.partNumber = partNumber;
 		this.name = name;
 		this.price = price;
 		this.unit = unit;
-		this.photoPath = photoPath;
+		this.photopath = photopath;
 		this.vendor = vendor;
 		this.id = id;
 		
@@ -71,16 +71,16 @@ public class Product {
 	@Override
 	public String toString() {
 		return "Product [partNumber=" + partNumber + ", name=" + name + ", price=" + price + ", unit=" + unit
-				+ ", photoPath=" + photoPath + ", vendor=" + vendor + ", id=" + id + "]";
+				+ ", photopath=" + photopath + ", vendor=" + vendor + ", id=" + id + "]";
 	}
 
-	public void setId(int id) {
+	public void setId(Integer id) {
 		this.id = id;
 	}
 	
-	public int getVendorId() {
+	public Vendor getVendor() {
 
-		return vendor.getId();
+		return vendor;
 	    
 	}
 
@@ -100,11 +100,11 @@ public class Product {
 		this.name = name;
 	}
 
-	public double getPrice() {
+	public Double getPrice() {
 		return price;
 	}
 
-	public void setPrice(double price) {
+	public void setPrice(Double price) {
 		this.price = price;
 	}
 
@@ -116,12 +116,12 @@ public class Product {
 		this.unit = unit;
 	}
 
-	public String getPhotoPath() {
-		return photoPath;
+	public String getPhotopath() {
+		return photopath;
 	}
 
-	public void setPhotoPath(String photoPath) {
-		this.photoPath = photoPath;
+	public void setPhotopath(String photopath) {
+		this.photopath = photopath;
 	}
 
 	public void setVendor(Vendor vendor) {

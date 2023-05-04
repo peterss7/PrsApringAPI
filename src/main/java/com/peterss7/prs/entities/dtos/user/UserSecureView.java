@@ -11,8 +11,6 @@ public class UserSecureView {
 	public String email;
 	public Boolean isReviewer;
 	public Boolean isAdmin;
-	public String error;
-	
 	
 	public UserSecureView(int id, String username, String firstname, String lastname, String phone, String email,
 			Boolean isReviewer, Boolean isAdmin) {
@@ -24,8 +22,7 @@ public class UserSecureView {
 		this.phone = phone;
 		this.email = email;
 		this.isReviewer = isReviewer;
-		this.isAdmin = isAdmin;
-		error = "";
+		this.isAdmin = isAdmin;		
 	}
 	
 	public UserSecureView(User user) {
@@ -43,14 +40,6 @@ public class UserSecureView {
 
 	public UserSecureView() {
 		super();	
-	}
-	
-	public UserSecureView(String error) {
-		this.error = error;
-	}
-
-	public String getError() {
-		return error;
 	}
 	
 	public int getId() {

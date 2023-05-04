@@ -1,7 +1,6 @@
 package com.peterss7.prs.controllers;
 
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -17,128 +16,78 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-
 import com.peterss7.prs.entities.Product;
-import com.peterss7.prs.entities.dtos.ProductCreate;
-import com.peterss7.prs.entities.product.ProductResponseDefault;
-import com.peterss7.prs.repositories.ProductRepository;
-
+import com.peterss7.prs.entities.dtos.product.ProductCreate;
+import com.peterss7.prs.entities.dtos.product.ProductDefaultResponse;
+import com.peterss7.prs.entities.dtos.product.ProductUpdate;
+import com.peterss7.prs.entities.dtos.product.ProductWithVendorIdResponse;
 import com.peterss7.prs.services.ProductService;
+import com.peterss7.prs.specifications.ProductSpecifications;
 
 @RestController
 @RequestMapping("/products")
 @CrossOrigin("http://localhost:4200")
 public class ProductController {
-	
+
 	@Autowired
 	private ProductService productService;
-	
 
-	
+	@PostMapping("")
+	public ResponseEntity<ProductWithVendorIdResponse> createProduct(@RequestBody ProductCreate newProduct) {
+		return productService.createProduct(newProduct);
+	}
+
+	@DeleteMapping("/{id}")
+	public ResponseEntity<Void> deleteProductById(@PathVariable int id) {
+		return productService.deleteProductById(id);
+	}
+
+	@GetMapping("/{id}")
+	public ResponseEntity<ProductWithVendorIdResponse> findProductById(@PathVariable int id) {
+
+		return productService.findProductById(id);
+	}
+
 	@GetMapping("")
-	public ResponseEntity<List<ProductResponseDefault>> findProductsByFields(
-			@RequestParam(required = false) String partNumber,
-			@RequestParam(required = false) String name,
-			@RequestParam(required = false) String unit,
-			@RequestParam(required = false) Double price,
-			@RequestParam(required = false) String photopath,
-			@RequestParam(required = false) Integer vendorId){
-		
+	public ResponseEntity<List<ProductWithVendorIdResponse>> findProductsByFields(
+			@RequestParam(required = false) String partNumber, @RequestParam(required = false) String name,
+			@RequestParam(required = false) String unit, @RequestParam(required = false) Double price,
+			@RequestParam(required = false) String photopath, @RequestParam(required = false) Integer vendorId) {
+
 		try {
-			
-			if ((partNumber == null)  && 
-				(name == null) &&
-				(unit == null)  &&
-				(price == null)     &&
-				(photopath == null)     &&
-				(vendorId == null)){
-				
-				List<ProductResponseDefault> products = productService.findAllProducts(); 
-				
-				return ResponseEntity.ok(products);
-				
-			} else{
-				List<ProductResponseDefault> products = productService.findProductsByFields(
-						partNumber, name, price,unit,
-						photopath, vendorId);
-				
-				if (products == null) {
-					return new ResponseEntity<List<ProductResponseDefault>>(products, HttpStatus.NOT_FOUND);
-				}
-				
-				return ResponseEntity.ok(products);
-				
-			}	
+
+			if ((partNumber == null) && (name == null) && (unit == null) && (price == null) && (photopath == null)
+					&& (vendorId == null)) {
+
+				return productService.findAllProducts();
+
+			} else {
+
+				Product searchTerm = new Product();
+
+				searchTerm.setPartNumber(partNumber);
+				searchTerm.setName(name);
+				searchTerm.setUnit(unit);
+				searchTerm.setPrice(price);
+				searchTerm.setPhotopath(photopath);
+				searchTerm.setVendor(productService.getProductVendor(vendorId));
+
+				return productService.findProductsByFields(ProductSpecifications.getProductSpecs(searchTerm));
+
+			}
 		} catch (Exception e) {
 			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
-		}				
-	}
-	
-	@GetMapping("/{id}")
-	public ResponseEntity<Product> findProductById(@PathVariable int id){
-		try {
-			Product product = productService.findProductById(id);
-			return new ResponseEntity<Product>(product, HttpStatus.OK);
-		}catch (Exception e) {
-			return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
 		}
-		
-	}
-	
-	@PostMapping("")
-	public ResponseEntity<Product> createProduct(@RequestBody ProductCreate newProduct){		
-		try {
-			Product product = productService.createProduct(newProduct);
-			return new ResponseEntity<>(product, HttpStatus.CREATED);
-		}catch(Exception e) {
-			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
-		}
-		
 	}
 
 	@PutMapping("/{id}")
-	public ResponseEntity<Product> updateProduct(@RequestBody Product updatedProduct){
-		return ResponseEntity.ok(productService.updateProduct(updatedProduct));
+	public ResponseEntity<String> updateProduct(@RequestBody ProductUpdate updatedProduct) {
+		return productService.updateProduct(updatedProduct);
+	}
+	
+	@DeleteMapping("/dev")
+	public void devProducts() {
+		productService.productsDev();
 	}
 
-	
-	@DeleteMapping("/{id}")
-	public ResponseEntity<Void> deleteProductById(@PathVariable int id){
-		return productService.deleteProductById(id);
-	}
-	
-	@DeleteMapping("")
-	public ResponseEntity<Void> deleteProductsByFields(
-			@RequestParam(required = false) String partNumber,
-			@RequestParam(required = false) String name,
-			@RequestParam(required = false) String unit,
-			@RequestParam(required = false) Double price,
-			@RequestParam(required = false) String photopath,
-			@RequestParam(required = false) Integer vendorId){
-		
-		try {
-			
-			if ((partNumber != null)  || 
-				(name != null) ||
-				(unit != null)  ||
-				(price != null)     ||
-				(photopath != null)     ||
-				(vendorId != null)){
-				
-				 
-				
-				return productService.deleteProductsByFields(
-							partNumber, name, price, 
-							unit, photopath, vendorId);
-			}
-			else {
-				return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
-			}
-				
-			
-		} catch (Exception e) {
-			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
-		}				
-	}
-	
 }

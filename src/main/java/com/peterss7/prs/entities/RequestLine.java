@@ -1,5 +1,7 @@
 package com.peterss7.prs.entities;
 
+import com.peterss7.prs.entities.dtos.requestLine.RequestLineCreate;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -16,13 +18,16 @@ public class RequestLine {
 	
 	@Id	
 	@Column(name = "Id")	
-	@GeneratedValue(strategy=GenerationType.AUTO)
-	private int id;
+	@GeneratedValue(strategy=GenerationType.IDENTITY)
+	private Integer id;
 	
 	
 	@OneToOne
 	@JoinColumn(name = "productId")
 	private Product product;
+	
+	@Column(name="Quantity")
+	private Integer quantity;
 	
 	
 	@ManyToOne
@@ -30,24 +35,23 @@ public class RequestLine {
 	private Request request;
 	
 
-	@Column(name="Quantity")
-	private int quantity;
-
 	public RequestLine() {		
 	}
 	
-	public RequestLine(int id, Request request, Product product, int quantity) {		
+	public RequestLine(Integer id, Request request, Product product, Integer quantity) {		
 		this.id = id;
 		this.request = request;
 		this.product = product;
 		this.quantity = quantity;
 	}
 	
-	public int getId() {
+
+	
+	public Integer getId() {
 		return id;
 	}
 
-	public void setId(int id) {
+	public void setId(Integer id) {
 		this.id = id;
 	}
 
@@ -67,11 +71,11 @@ public class RequestLine {
 		this.product = product;
 	}
 
-	public int getQuantity() {
+	public Integer getQuantity() {
 		return quantity;
 	}
 
-	public void setQuantity(int quantity) {
+	public void setQuantity(Integer quantity) {
 		this.quantity = quantity;
 	}
 

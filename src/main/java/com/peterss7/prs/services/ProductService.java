@@ -4,210 +4,185 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import com.peterss7.prs.controllers.UserController;
 import com.peterss7.prs.entities.Product;
-import com.peterss7.prs.entities.dtos.ProductCreate;
-import com.peterss7.prs.entities.product.ProductResponseDefault;
+import com.peterss7.prs.entities.Vendor;
+import com.peterss7.prs.entities.dtos.product.ProductCreate;
+import com.peterss7.prs.entities.dtos.product.ProductDefaultResponse;
+import com.peterss7.prs.entities.dtos.product.ProductUpdate;
+import com.peterss7.prs.entities.dtos.product.ProductWithVendorIdResponse;
 import com.peterss7.prs.repositories.ProductRepository;
 import com.peterss7.prs.specifications.ProductSpecifications;
 
 @Service
-public class ProductService implements IProductService{
+public class ProductService implements IProductService {
+
+	private static final Logger LOGGER = LoggerFactory.getLogger(ProductService.class);
 
 	private final ProductRepository productRepository;
 	@Autowired
 	VendorService vendorService;
-	
-	
-	
+
 	public ProductService(ProductRepository productRepository) {
 		this.productRepository = productRepository;
 	}
-	
+
 	@Override
-	public List<ProductResponseDefault> findAllProducts(){
-		
-		List<Product> products = productRepository.findAll();
-		List<ProductResponseDefault> productResponses = new ArrayList<ProductResponseDefault>();
-		
-		for (Product product : products) {
-			productResponses.add(new ProductResponseDefault(product));
+	public ResponseEntity<ProductWithVendorIdResponse> createProduct(ProductCreate newProductObject) {
+
+		try {
+			Product newProduct = new Product();
+
+			newProduct.setName(newProductObject.getName());
+			newProduct.setPartNumber(newProductObject.getPartNumber());
+			newProduct.setUnit(newProductObject.getUnit());
+			newProduct.setPrice(newProductObject.getPrice());
+			newProduct.setPhotopath(newProductObject.getPhotopath());
+			newProduct.setVendor(getProductVendor(newProductObject.getVendorId()));
+
+			Product savedProduct = productRepository.save(newProduct);
+			return new ResponseEntity<ProductWithVendorIdResponse>(new ProductWithVendorIdResponse(savedProduct),
+					HttpStatus.CREATED);
+
+		} catch (Exception e) {
+			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
-		
-		return productResponses;
+
 	}
-	
-	@Override 
-	public Product findProductById(int id) {
-		
+
+	@Override
+	public Vendor getProductVendor(int id) {
+		return vendorService.findVendorById(id);
+	}
+
+	@Override
+	public ResponseEntity<Void> deleteProductById(int id) {
+
 		Optional<Product> optionalProduct = productRepository.findById(id);
-		
-		if (optionalProduct.isPresent()) {
-			return optionalProduct.get();
-		}
-		else {
-			return null;
-		}
-		
-	}
-	
-	@Override
-	public List<Product> findProductsByFields(Specification<Product> spec){
-		
-		List<Product> products = new ArrayList<Product>();
-		
-		Optional<List<Product>> optionalProducts = productRepository.findAll(spec);
-		
-		if (optionalProducts.isPresent()) {
-			products = optionalProducts.get();
-		}
-		
-		return products;
-	}
-	
-	@Override
-	public List<ProductResponseDefault> findProductsByFields(String partNumber, String name, Double price,
-		String unit, String photopath, Integer vendorId){
-		
-		Specification<Product> spec = Specification.where(null);
-		
-		if (partNumber != null) {
-			System.out.println("partNumber is: " + partNumber);
-			spec = spec.and(ProductSpecifications.partNumberLike(partNumber));
-		}
-		if (name != null) {
-			System.out.println("first name is: " + name);
-			spec = spec.and(ProductSpecifications.nameLike(name));
-		}
-		if (price != null) {
-			spec = spec.and(ProductSpecifications.priceLike(price));
-		}
-		if (unit != null) {
-			spec = spec.and(ProductSpecifications.unitLike(unit));
-		}
-		if (photopath != null) {
-			spec = spec.and(ProductSpecifications.photopathLike(photopath));
-		}
-		if (vendorId != null) {
-			spec = spec.and(ProductSpecifications.vendorIdLike(vendorId));
-		}
-		
-		
-		System.out.println(spec.hashCode());
-		
-		// List<Product> products = productRepository.findAll(spec);
-		
-		List<ProductResponseDefault> products = new ArrayList<ProductResponseDefault>();
-		
-		Optional<List<Product>> optionalProducts = productRepository.findAll(spec);
-		
-		if (optionalProducts.isPresent()) {
-			for (Product product : optionalProducts.get()) {
-				products.add(new ProductResponseDefault(product));	
-			}
-			
-		}
-		else {
-			return null;
-		}
-		
-		
-		return products;
-	}
-	
-	@Override
-	public Product createProduct(ProductCreate newProductObject) {
-		
-		Product newProduct = new Product();
-		
-		newProduct.setName(newProductObject.getName());
-		newProduct.setPartNumber(newProductObject.getPartNumber());
-		newProduct.setUnit(newProductObject.getUnit());
-		newProduct.setPrice(newProductObject.getPrice());
-		newProduct.setPhotoPath(newProductObject.getPhotopath());
-		newProduct.setVendor(vendorService.findVendorById(newProductObject.getVendorId()));
-		
-		Product savedProduct = productRepository.save(newProduct);		
-		return savedProduct;
-	}
-	
-	@Override
-	public Product updateProduct(Product updatedProduct) {
-		
-		Product product = new Product();
-		
-		Optional<Product> optionalProduct = productRepository.findById(updatedProduct.getId());
-		
-		if (optionalProduct.isPresent()) {
-			product = productRepository.save(updatedProduct);
-		}
-		
-		return product;				
-	}
-	
-	@Override
-	public ResponseEntity<Void> deleteProductById(int id) {		
-		
-		Optional<Product> optionalProduct = productRepository.findById(id);
-		
+
 		if (!optionalProduct.isPresent()) {
 			return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
-		}
-		else
-		{
+		} else {
 			productRepository.deleteById(id);
 			return new ResponseEntity<>(null, HttpStatus.NO_CONTENT);
 		}
-		
+
+	}
+
+	@Override
+	public ResponseEntity<List<ProductWithVendorIdResponse>> findAllProducts() {
+
+		// LOGGER.warn("Entering findAllProducts()");
+
+		try {
+
+			List<Product> products = productRepository.findAll();
+
+			return new ResponseEntity<List<ProductWithVendorIdResponse>>
+					(ProductWithVendorIdResponse.getResponses(products),
+					HttpStatus.OK);
+
+		} catch (Exception e) {
+			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+
+	public List<Product> findAllProductsDev() {
+
+		return productRepository.findAll();
+
+	}
+
+	@Override
+	public ResponseEntity<ProductWithVendorIdResponse> findProductById(int id) {
+
+		try {
+
+			Optional<Product> optionalProduct = productRepository.findById(id);
+
+			if (optionalProduct.isPresent()) {
+				return new ResponseEntity<ProductWithVendorIdResponse>(
+						new ProductWithVendorIdResponse(optionalProduct.get()), HttpStatus.OK);
+			} else {
+				return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+			}
+
+		} catch (Exception e) {
+			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+
+	}
+
+	@Override
+	public ResponseEntity<List<ProductWithVendorIdResponse>> findProductsByFields(Specification<Product> spec) {
+
+		try {
+
+			Optional<List<Product>> optionalProducts = productRepository.findAll(spec);
+
+			if (optionalProducts.isPresent()) {
+				return new ResponseEntity<List<ProductWithVendorIdResponse>>(
+						ProductWithVendorIdResponse.getResponses(optionalProducts.get()), HttpStatus.OK);
+			} else {
+				return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+			}
+		} catch (Exception e) {
+			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+
+	@Override
+	public ResponseEntity<String> updateProduct(ProductUpdate updatedProduct) {
+
+		try {
+
+			Optional<Product> optionalProduct = productRepository.findById(updatedProduct.getId());
+
+			if (optionalProduct.isPresent()) {
+				
+				Product saveProduct = optionalProduct.get();
+				
+				saveProduct.setVendor(getProductVendor(updatedProduct.getVendorId()));
+				saveProduct.setName(updatedProduct.getName());
+				saveProduct.setPartNumber(updatedProduct.getPartNumber());
+				saveProduct.setUnit(updatedProduct.getUnit());
+				saveProduct.setPrice(updatedProduct.getPrice());
+				saveProduct.setPhotopath(updatedProduct.getPhotopath());
+				
+				
+				productRepository.save(saveProduct);
+				return new ResponseEntity<>(null, HttpStatus.NO_CONTENT);
+			}
+
+			return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+
+		} catch (Exception e) {
+			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+
 	}
 	
-	@Override
-	public ResponseEntity<Void> deleteProductsByFields(String partNumber, String name, Double price,
-		String unit, String photopath, Integer vendorId){
+	public void productsDev() {
 		
-		Specification<Product> spec = Specification.where(null);
+		List<Product> products = productRepository.findAll();
 		
-		if (partNumber != null) {
-			System.out.println("partNumber is: " + partNumber);
-			spec = spec.and(ProductSpecifications.partNumberLike(partNumber));
-		}
-		if (name != null) {
-			System.out.println("first name is: " + name);
-			spec = spec.and(ProductSpecifications.nameLike(name));
-		}
-		if (price != null) {
-			spec = spec.and(ProductSpecifications.priceLike(price));
-		}
-		if (unit != null) {
-			spec = spec.and(ProductSpecifications.unitLike(unit));
-		}
-		if (photopath != null) {
-			spec = spec.and(ProductSpecifications.photopathLike(photopath));
-		}
-		if (vendorId != null) {
-			spec = spec.and(ProductSpecifications.vendorIdLike(vendorId));
-		}
-		if (vendorId != null) {
-			spec = spec.and(ProductSpecifications.vendorIdLike(vendorId));
-		}
-
-		List<Product> deleteProducts = new ArrayList<Product>();
-		Optional<List<Product>> optionalProducts = productRepository.findAll(spec);
+		LOGGER.warn("***DEV***");
 		
-		
-		if (optionalProducts.isPresent()) {
-			deleteProducts = optionalProducts.get();
-			return new ResponseEntity<>(null, HttpStatus.NO_CONTENT);
-		}
-		else {
-			return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+		for (Product product : products) {			
+			if (product.getVendor() == null) {
+				LOGGER.warn(product.getVendor() + "?");
+				productRepository.delete(product);
+			}
+			
 		}
 	}
-
 
 }

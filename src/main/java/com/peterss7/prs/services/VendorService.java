@@ -1,9 +1,10 @@
 package com.peterss7.prs.services;
 
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
@@ -43,23 +44,45 @@ public class VendorService implements IVendorService{
 	}
 	
 	@Override
+	public ResponseEntity<List<Vendor>> findVendorsByFields(Specification<Vendor> spec){
+		
+		Optional<List<Vendor>> optionalVendors = vendorRepository.findAll(spec);
+		
+		if (optionalVendors.isPresent()) {
+			return new ResponseEntity<List<Vendor>>(optionalVendors.get(), HttpStatus.OK);
+		}
+		else {
+			return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+		}
+		
+	}
+	
+	@Override
 	public Vendor createVendor(Vendor newVendor) {		
 		Vendor savedVendor = vendorRepository.save(newVendor);		
 		return savedVendor;
 	}
 	
 	@Override
-	public Vendor updateVendor(Vendor updatedVendor) {
+	public ResponseEntity<String> updateVendor(Vendor updatedVendor) {
 		
-		Vendor vendor = new Vendor();
+		String validity = validateVendorValues(updatedVendor);
+		
+		if (!validity.equals("OK")) {
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(validity);
+		}
 		
 		Optional<Vendor> optionalVendor = vendorRepository.findById(updatedVendor.getId());
 		
 		if (optionalVendor.isPresent()) {
-			vendor = vendorRepository.save(updatedVendor);
+			vendorRepository.save(updatedVendor);
+			return ResponseEntity.status(HttpStatus.OK).body("VENDOR UPDATED");
+		}
+		else {
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body("VENDOR NOT FOUND");
 		}
 		
-		return vendor;				
+						
 	}
 	
 	@Override
@@ -68,34 +91,98 @@ public class VendorService implements IVendorService{
 		Optional<Vendor> optionalVendor = vendorRepository.findById(id);
 		
 		if (!optionalVendor.isPresent()) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body("VENDOR NOT FOUND");
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body("INVALID VENDOR ID");
 		}
 		else {
-			vendorRepository.delete(optionalVendor.get());
-			return ResponseEntity.status(HttpStatus.NO_CONTENT).body("VENDOR DELETED");	
-		}
-		
-		
-	}
+			vendorRepository.deleteById(id);
+			return ResponseEntity.status(HttpStatus.NO_CONTENT).body("USER DELETED");	
+		}	
+	}	
 	
-	
-	@Override
-	public List<Vendor> findVendorsByFields(Specification<Vendor> spec) {
-		
-	List<Vendor> vendors = new ArrayList<Vendor>();
-		
-		Optional<List<Vendor>> optionalVendor = vendorRepository.findAll(spec);
-		
-		if (optionalVendor.isPresent()) {
-			vendors = optionalVendor.get();
-		}
-		
-		return vendors;
-	}
-
 	@Override
 	public String validateVendorValues(Vendor vendor) {
-		// TODO Auto-generated method stub
-		return null;
+		
+		if (vendor.getCode() != null) {			
+			if (vendor.getCode().length() > 30) {
+				return "INVALID: CODE TOO LONG";
+			}			
+		}
+		if (vendor.getName() != null) {
+			if (vendor.getName().length() > 30) {
+				return "INVALID: NAME TOO LONG";
+			}
+			
+			Pattern namePattern = Pattern.compile("^[A-Za-z ]+");
+			Matcher nameMatcher = namePattern.matcher(vendor.getName());
+			
+			if (!nameMatcher.matches()) {
+				return "INVALID: INCORRECT NAME FORMAT";
+			}
+		}
+		if (vendor.getAddress() != null) {
+			if (vendor.getAddress().length() > 100) {
+				return "INVALID: ADDRESS TOO LONG";
+			}
+			
+			Pattern addressPattern = Pattern.compile("^\\d{0,5}([ ]*[a-zA-Z]+)*$");
+			Matcher addressMatcher = addressPattern.matcher(vendor.getAddress());
+			
+			if (!addressMatcher.matches()) {
+				return "INVALID: INCORRECT ADDRESS FORMAT";
+			}
+			
+		}
+		if (vendor.getCity() != null) {
+			if (vendor.getCity().length() > 30) {
+				return "INVALID: CITY TOO LONG";
+			}
+			
+			Pattern cityPattern = Pattern.compile("^[A-Za-z ]+$");
+			Matcher cityMatcher = cityPattern.matcher(vendor.getCity());
+			
+			if (!cityMatcher.matches()) {
+				return "INVALID: CITY CAN ONLY CONTAIN LETTERS";
+			}
+			
+		}
+		if (vendor.getState() != null) {
+			Pattern statePattern = Pattern.compile("[A-Z]{2}$");
+			Matcher stateMatcher = statePattern.matcher(vendor.getState());
+			
+			if (!stateMatcher.matches()) {
+				return "INVALID: INVALID STATE ABV FORMAT";
+			}
+		}
+		if (vendor.getZip() != null) {
+			
+			Pattern zipPattern = Pattern.compile("^[1-9]{1,5}$");
+			Matcher zipMatcher = zipPattern.matcher(vendor.getZip());
+			
+			if (!zipMatcher.matches()) {
+				return "INVALID: INCORRECT ZIPCODE FORMAT";
+			}
+		}
+		if (vendor.getPhone() != null) {
+			Pattern phonePattern = Pattern.compile("[1-9]{3}-[0-9]{3}-[0-9]{4}$");
+			Matcher phoneMatcher = phonePattern.matcher(vendor.getPhone());
+			
+			if (!phoneMatcher.matches()) {
+				return "INVALID: INCORRECT PHONE NUMBER FORMAT";
+			}
+		}
+		if (vendor.getEmail() != null) {
+			
+			Pattern emailPattern = Pattern.compile("^[A-Za-z\\d]+\\.?[A-Za-z\\d]+@[A-Za-z]+\\.[A-Za-z]+$");
+			Matcher emailMatcher = emailPattern.matcher(vendor.getEmail());
+			
+			if (!emailMatcher.matches()) {
+				return "INVALID: INCORRECT EMAIL FORMAT";
+			}
+		}
+		
+		return "OK";
+		
 	}
+	
+
 }

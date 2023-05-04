@@ -119,16 +119,7 @@ public class UserController {
 	
 	@GetMapping("/{id}")
 	public ResponseEntity<UserSecureView> findUserById(@PathVariable int id){
-		try {
-			
-			/*
-			
-			User user = userService.findUserById(id);
-			
-			UserSecureView userSecure = new UserSecureView(user);
-			
-			return new ResponseEntity<UserSecureView>(userSecure, HttpStatus.OK);
-			*/
+		try {		
 			
 			return userService.findUserById(id);
 			

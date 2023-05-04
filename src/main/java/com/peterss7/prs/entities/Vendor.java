@@ -37,6 +37,9 @@ public class Vendor {
 	@Column(name="Email")
 	private String email;
 	
+	@OneToMany(mappedBy = "vendor")	
+	private List<Product> products;
+	
 	
 	
 	
