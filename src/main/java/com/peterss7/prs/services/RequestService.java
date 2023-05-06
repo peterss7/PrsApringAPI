@@ -73,8 +73,10 @@ public class RequestService implements IRequestService {
 		Optional<User> optionalUser = userService.findRawUserById(id);
 
 		if (optionalUser.isEmpty()) {
+			LOGGER.warn("no user found in getrequestuser");
 			return user;
 		} else {
+			LOGGER.warn("user found in getrequestuser");
 			return optionalUser.get();
 		}
 

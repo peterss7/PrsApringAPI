@@ -3,8 +3,10 @@ package com.peterss7.prs.controllers;
 import java.time.LocalDate;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -35,6 +37,8 @@ public class RequestController {
 
 	@Autowired
 	private RequestService requestService;
+	
+	private static final Logger LOGGER = LoggerFactory.getLogger(RequestService.class);
 
 	@GetMapping("")
 	public ResponseEntity<List<RequestDefaultResponse>> findAll(@RequestParam(required = false) String deliveryMode,
@@ -91,6 +95,18 @@ public class RequestController {
 
 	}
 
+	@GetMapping("/requests-by-uid")
+	ResponseEntity<List<RequestDefaultResponse>> getRequestsByUserId(@RequestParam int userId) {
+		String urlOut = "http://localhost:8080/requests/requests-by-id?userId=" + userId;
+		LOGGER.warn(urlOut);
+		Integer intOut = null;
+		LocalDate date1 = null;
+		LocalDate date2 = null;
+		List<RequestDefaultResponse> requests = this.findAll("", date1, date2, "", intOut).getBody();
+		
+		return new ResponseEntity<List<RequestDefaultResponse>>(requests, HttpStatus.OK);
+	}
+
 	@DeleteMapping("/{id}")
 	public ResponseEntity<String> deleteRequest(@PathVariable int id) {
 		return requestService.deleteRequest(id);
@@ -100,19 +116,19 @@ public class RequestController {
 	public ResponseEntity<Void> reviewRequest(@PathVariable int id) {
 		return requestService.reviewRequest(id);
 	}
-	
+
 	@PutMapping("/{id}/approve")
 	public ResponseEntity<Void> approveRequest(@PathVariable int id) {
 		return requestService.approveRequest(id);
 	}
-	
+
 	@PutMapping("/{id}/reject")
 	public ResponseEntity<Void> rejectRequest(@RequestBody RequestRejection requestRejection) {
 		return requestService.rejectRequest(requestRejection);
 	}
-	
+
 	@GetMapping("/review/{userId}")
-	public ResponseEntity<List<RequestReviewResponse>> findRequestsInReview(@PathVariable int userId){
+	public ResponseEntity<List<RequestReviewResponse>> findRequestsInReview(@PathVariable int userId) {
 		return requestService.findRequestsInReview(userId);
 	}
 

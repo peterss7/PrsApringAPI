@@ -1,39 +1,41 @@
 package com.peterss7.prs.services;
 
 import java.util.ArrayList;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Component;
 import java.util.List;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import com.peterss7.prs.entities.Request;
 import com.peterss7.prs.entities.User;
 import com.peterss7.prs.entities.dtos.user.UserAuthenticated;
-import com.peterss7.prs.entities.dtos.user.UserSecureView;
 import com.peterss7.prs.entities.dtos.user.UserCredentials;
+import com.peterss7.prs.entities.dtos.user.UserSecureView;
 import com.peterss7.prs.repositories.UserRepository;
-import com.peterss7.prs.specifications.RequestSpecifications;
 import com.peterss7.prs.specifications.UserSpecifications;
 
 @Service
 public class UserService implements IUserService {
 
-	private final UserRepository userRepository;
+
 	private static final Logger LOGGER = LoggerFactory.getLogger(UserService.class);
 
-	private RequestService requestService;
-
-	public UserService(UserRepository userRepository) {
-		this.userRepository = userRepository;
-	}
+	private UserRepository userRepository;
+	
+	
+   
+    public UserService(UserRepository userRepository) {
+        this.userRepository = userRepository;
+    }
+    
+    
 
 	@Override
 	public List<User> findAllUsers() {
@@ -215,52 +217,21 @@ public class UserService implements IUserService {
 
 	}
 
-	@Override
-	public ResponseEntity<String> deleteUserById(int id) {
+	
+	public void deleteUserById(int id) {
+		/*
+		String url = "http://localhost:8080/requests?userId=" + id;
+        ResponseEntity<Request[]> response = restTemplate.getForEntity(url, Request[].class);
+        Request[] requests = response.getBody();
+        for (Request request : requests) {
+        	LOGGER.warn(request + "");
+        }
+        */
 		
-		
-			Optional<User> optionalUser= userRepository.findById(id);
-		
-			if (!optionalUser.isPresent()) {
-				return ResponseEntity.status(HttpStatus.NOT_FOUND).body("USER NOT FOUND");
-			} else {
-				userRepository.deleteById(id);
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
-			
-			}
-			/*
-			else if (this.isValidDeletion(id)) {
-				try {
-					LOGGER.warn("USER WITH ID: " + id + " WAS DELETED");
-					userRepository.deleteById(id);
-					return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
-				} catch ( Exception e) {
-					LOGGER.warn("USER FAILED TO Delete");
-					return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
-				}
-				
-				
-			}*/ //else {
-			//	LOGGER.warn("??????WHY NO DELETE");
-			//	return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
-			//}
-
+	
 	}
 
-	public boolean isValidDeletion(int id) {
-
-		List<Request> requests = requestService.findRequestsByFieldsRaw(id);
-		LOGGER.warn("size: " + requests.size());
-		if (!requests.isEmpty() && requests.size() > 0) {
-			LOGGER.warn("USER WITH HAS REQUESTS");
-			return false;
-		} else {
-			LOGGER.warn("USER WITH HAS NO REQUESTS");
-			return true;
-		}
-
-	}
-
+	
 	@Override
 	public String validateUserValues(User user) {
 

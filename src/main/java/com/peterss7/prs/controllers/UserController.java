@@ -27,6 +27,7 @@ import com.peterss7.prs.entities.dtos.user.UserAuthenticated;
 import com.peterss7.prs.entities.dtos.user.UserCreated;
 import com.peterss7.prs.entities.dtos.user.UserSecureView;
 import com.peterss7.prs.entities.dtos.user.UserCredentials;
+import com.peterss7.prs.services.RequestService;
 import com.peterss7.prs.services.UserService;
 import com.peterss7.prs.specifications.UserSpecifications;
 
@@ -39,7 +40,7 @@ public class UserController {
 
 	@Autowired
 	private UserService userService;
-
+	
 	@GetMapping("")
 	public ResponseEntity<List<UserSecureView>> findUserByFields(
 
@@ -183,14 +184,23 @@ public class UserController {
 	}
 
 	@DeleteMapping("/{id}")
-	public void deleteUserById(@PathVariable int id) {
+	public ResponseEntity<String> deleteUserById(@PathVariable int id) {
 		LOGGER.warn("DELETING");
 		
-		try {
-			userService.deleteUserById(id);	
-		} catch(Exception e) {
-			LOGGER.warn("DELETE FAILED");
+		/*
+		if (userService.deleteUserById(id)) {
+			return ResponseEntity.status(HttpStatus.NO_CONTENT).body("User deleted.");	
 		}
+		else {
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("User persists...");
+		}
+		*/
+		
+		return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("TESTING");
+		
+		
+			
+		
 		
 		
 	}
