@@ -1,0 +1,112 @@
+package com.peterss7.prs.entities.dtos.user;
+import com.peterss7.prs.entities.User;
+
+public class UserCreated {
+	public int id;
+	public String username;
+	public String password;
+	public String firstname;
+	public String lastname;
+	public String phone;
+	public String email;
+	public Boolean isReviewer;
+	public Boolean isAdmin;
+	
+	public UserCreated(int id, String username, String password, String firstname, String lastname, String phone, String email,
+			Boolean isReviewer, Boolean isAdmin) {
+		super();
+		this.id = id;		
+		this.username = username;
+		this.password = password;
+		this.firstname = firstname;
+		this.lastname = lastname;
+		this.phone = phone;
+		this.email = email;
+		this.isReviewer = isReviewer;
+		this.isAdmin = isAdmin;
+	}
+	public UserCreated() {
+		super();
+		// TODO Auto-generated constructor stub
+	}
+	
+	public static User createdUser(UserCreated userCreated) {		
+		
+		User user = new User(); 
+		
+		user.setUsername(userCreated.getUsername());
+		user.setPassword(userCreated.getPassword());
+		user.setFirstname(userCreated.getFirstname());
+		user.setLastname(userCreated.getLastname());
+		user.setPhone(userCreated.getPhone());
+		user.setEmail(userCreated.getEmail());
+		
+		return user;
+	}
+	
+	public int getId() {
+		return id;
+	}
+	public void setId(int id) {
+		this.id = id;
+	}
+	
+	public void setPassword(String password) {
+		this.password = password;
+	}
+	
+	public String getPassword()	{
+		return this.password;
+	}
+	public String getUsername() {
+		return username;
+	}
+	public void setUsername(String username) {
+		this.username = username;
+	}
+	public String getFirstname() {
+		return firstname;
+	}
+	public void setFirstname(String firstname) {
+		this.firstname = firstname;
+	}
+	public String getLastname() {
+		return lastname;
+	}
+	public void setLastname(String lastname) {
+		this.lastname = lastname;
+	}
+	public String getPhone() {
+		return phone;
+	}
+	public void setPhone(String phone) {
+		this.phone = phone;
+	}
+	public String getEmail() {
+		return email;
+	}
+	public void setEmail(String email) {
+		this.email = email;
+	}
+	public Boolean getIsReviewer() {
+		return isReviewer;
+	}
+	public void setIsReviewer(Boolean isReviewer) {
+		this.isReviewer = isReviewer;
+	}
+	public Boolean getIsAdmin() {
+		return isAdmin;
+	}
+	public void setIsAdmin(Boolean isAdmin) {
+		this.isAdmin = isAdmin;
+	}
+	@Override
+	public String toString() {
+		return "UserCreated [id=" + id + ", username=" + username + ", password=" + password + ", firstname=" + firstname
+				+ ", lastname=" + lastname + ", phone=" + phone + ", email=" + email + ", isReviewer=" + isReviewer
+				+ ", isAdmin=" + isAdmin + "]";
+	}
+	
+	
+	
+}

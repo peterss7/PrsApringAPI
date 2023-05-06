@@ -95,6 +95,36 @@ public class RequestService implements IRequestService {
 		}
 
 	}
+	
+	
+	public List<Request> findRequestsByFieldsRaw(int id) {
+
+		// Optional<List<Request>> optionalRequests = requestRepository.findAll(spec);
+		LOGGER.warn("checking id: " + id);
+		
+		List<Request> requests = requestRepository.findAll();
+		
+		List<Request> foundUserRequests = new ArrayList<Request>();
+		
+		for (Request request : requests) {
+			if (request.getUser().getId() == id) {
+				foundUserRequests.add(request);
+			}
+		}
+		LOGGER.warn("optional requests is: " + foundUserRequests.size());
+
+		if (foundUserRequests.size() > 0) {
+			
+			LOGGER.warn("optional requests is: " + foundUserRequests.size());
+
+			
+
+			return foundUserRequests;
+		} else {
+			return null;
+		}
+
+	}
 
 	@Override
 	public ResponseEntity<RequestNewResponse> createRequest(RequestNew newRequestObject) {

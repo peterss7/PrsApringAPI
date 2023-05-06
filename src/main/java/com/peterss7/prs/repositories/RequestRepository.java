@@ -10,4 +10,7 @@ import com.peterss7.prs.entities.Request;
 
 public interface RequestRepository extends JpaRepository<Request, Integer>{
 	Optional<List<Request>> findAll(Specification<Request> spec);
+	
+	
+	
 }

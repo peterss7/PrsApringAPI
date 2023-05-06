@@ -6,17 +6,17 @@ public class UserAuthenticated {
 	public String lastname;
 	public Boolean isReviewer;
 	public Boolean isAdmin;
-	
+
 	public UserAuthenticated(int id, String firstname, String lastname, Boolean isReviewer, Boolean isAdmin) {
 		super();
-		
+
 		this.id = id;
 		this.firstname = firstname;
 		this.lastname = lastname;
 		this.isReviewer = isReviewer;
 		this.isAdmin = isAdmin;
 	}
-	
+
 	public UserAuthenticated() {
 
 	}
@@ -24,32 +24,47 @@ public class UserAuthenticated {
 	public int getId() {
 		return id;
 	}
+
 	public void setId(int id) {
 		this.id = id;
 	}
+
 	public String getFirstname() {
 		return firstname;
 	}
+
 	public void setFirstname(String firstname) {
 		this.firstname = firstname;
 	}
+
 	public String getLastname() {
 		return lastname;
 	}
+
 	public void setLastname(String lastname) {
 		this.lastname = lastname;
 	}
+
 	public Boolean getIsReviewer() {
 		return isReviewer;
 	}
+
 	public void setIsReviewer(Boolean isReviewer) {
 		this.isReviewer = isReviewer;
 	}
+
 	public Boolean getIsAdmin() {
 		return isAdmin;
 	}
+
 	public void setIsAdmin(Boolean isAdmin) {
 		this.isAdmin = isAdmin;
 	}
-}
 
+	@Override
+	public String toString() {
+		return "UserAuthenticated [id=" + id + ", firstname=" + firstname + ", lastname=" + lastname + ", isReviewer="
+				+ isReviewer + ", isAdmin=" + isAdmin + "]";
+	}
+
+}
