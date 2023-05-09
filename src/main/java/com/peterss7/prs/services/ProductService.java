@@ -60,7 +60,7 @@ public class ProductService implements IProductService {
 
 	@Override
 	public Vendor getProductVendor(int id) {
-		return vendorService.findVendorById(id);
+		return vendorService.findVendorById(id).getBody();
 	}
 
 	@Override
@@ -141,9 +141,13 @@ public class ProductService implements IProductService {
 
 	@Override
 	public ResponseEntity<String> updateProduct(ProductUpdate updatedProduct) {
+		
+		LOGGER.warn("updating with this: " + updatedProduct.toString());
 
 		try {
 
+			LOGGER.warn("in try");
+			
 			Optional<Product> optionalProduct = productRepository.findById(updatedProduct.getId());
 
 			if (optionalProduct.isPresent()) {

@@ -2,6 +2,8 @@ package com.peterss7.prs.controllers;
 
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 
@@ -24,12 +26,14 @@ import com.peterss7.prs.specifications.VendorSpecifications;
 
 
 @RestController
-@RequestMapping("/vendors")
+@RequestMapping("/vendor")
 @CrossOrigin("http://localhost:4200")
 public class VendorController {
 	
 	@Autowired
 	private VendorService vendorService;
+	
+	private static final Logger LOGGER = LoggerFactory.getLogger(VendorController.class);
 	
 	@GetMapping("")
 	public ResponseEntity<List<Vendor>> findVendorsByFields(
@@ -101,12 +105,10 @@ public class VendorController {
 	@GetMapping("/{id}")
 	public ResponseEntity<Vendor> findVendorById(@PathVariable int id) {
 		
-		try {
-			Vendor vendor = vendorService.findVendorById(id);
-			return new ResponseEntity<Vendor>(vendor, HttpStatus.OK);
-		} catch(Exception e) {
-			return new ResponseEntity<>( null, HttpStatus.NOT_FOUND);
-		}
+		
+		return vendorService.findVendorById(id);
+			
+		
 		
 		
 	}
@@ -129,6 +131,7 @@ public class VendorController {
 	
 	@DeleteMapping("/{id}")
 	public ResponseEntity<String> deleteVendor(@PathVariable int id){
+		LOGGER.warn("id: " + id);
 		return vendorService.deleteVendorById(id);
 	}	
 }

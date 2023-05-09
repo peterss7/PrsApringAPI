@@ -21,8 +21,7 @@ public interface IUserService {
 			Specification<User> spec);
 	public abstract ResponseEntity<UserSecureView> createUser(User newUser);
 	public abstract ResponseEntity<String> updateUser(User updatedUser);
-	// public abstract ResponseEntity<String> deleteUserById(int id);	
-	// public abstract boolean deleteUserById(int id);
+	public abstract ResponseEntity<String> deleteUserById(int id);	
     public abstract UserAuthenticated authenticate(UserCredentials credentials);    
     public abstract String validateUserValues(User user);
     public abstract Optional<User> findRawUserById(int id);

@@ -52,6 +52,7 @@ public class Request {
 	@Column(name="Status")
 	private String status;
 	
+	@Column(name="Total")
 	private Double total;
 	
 	@OneToMany(mappedBy = "request")	

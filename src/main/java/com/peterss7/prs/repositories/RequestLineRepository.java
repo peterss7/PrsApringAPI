@@ -14,7 +14,7 @@ import com.peterss7.prs.entities.User;
 
 public interface RequestLineRepository extends JpaRepository<RequestLine, Integer> {
 	
-	Optional<List<RequestLine>> findAll(Specification<RequestLine> spec);
+	List<RequestLine> findAll(Specification<RequestLine> spec);
 	
 	@Query("SELECT r FROM RequestLine r WHERE r.request = :request")
     Optional<List<RequestLine>> findByRequest(@Param("request") Request request);

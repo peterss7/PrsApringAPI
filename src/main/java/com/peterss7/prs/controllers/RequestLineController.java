@@ -31,13 +31,10 @@ public class RequestLineController {
 	@Autowired
 	private RequestLineService requestLineService;
 
-	/*
-	 * @GetMapping("") public List<RequestLine> findAll(){
-	 * 
-	 * List<RequestLine> requestLines = requestLineRepository.findAll();
-	 * 
-	 * return requestLines; }
-	 */
+	@GetMapping("")
+	public List<RequestLine> findAll() {
+		return requestLineService.findAll();
+	}
 
 	@GetMapping("/{id}")
 	public ResponseEntity<RequestLineDefaultResponse> findById(@PathVariable Integer id) {
@@ -45,26 +42,26 @@ public class RequestLineController {
 		return requestLineService.findRequestLineById(id);
 
 	}
+
 	@GetMapping("/findByRequest/{id}")
 	public ResponseEntity<List<RequestLineDefaultResponse>> findByRequestId(@PathVariable Integer id) {
 		return requestLineService.findByRequest(id);
-		
+
 	}
-	
+
 	@PostMapping("")
-	public ResponseEntity<RequestLineCreateResponse> createRequestLine(@RequestBody RequestLineCreate newRequestLine){
+	public ResponseEntity<RequestLineCreateResponse> createRequestLine(@RequestBody RequestLineCreate newRequestLine) {
 		return requestLineService.createRequestLine(newRequestLine);
 	}
-	
+
 	@PutMapping("/{id}")
-	public ResponseEntity<String> updateRequestLine(@RequestBody RequestLineUpdate updateRequestLine){
+	public ResponseEntity<String> updateRequestLine(@RequestBody RequestLineUpdate updateRequestLine) {
 		return requestLineService.updateRequestLine(updateRequestLine);
 	}
-	
+
 	@DeleteMapping("/{id}")
-	public ResponseEntity<String> deleteRequestLine(@PathVariable Integer id){
+	public ResponseEntity<String> deleteRequestLine(@PathVariable Integer id) {
 		return requestLineService.deleteRequestLine(id);
 	}
-	
-	
+
 }

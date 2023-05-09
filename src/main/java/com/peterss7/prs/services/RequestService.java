@@ -176,9 +176,12 @@ public class RequestService implements IRequestService {
 				if (requestUpdate.getDateNeeded() != null) {
 					request.setDateNeeded(requestUpdate.getDateNeeded());
 				}
+				if (requestUpdate.getTotal() != null) {
+					request.setTotal(requestUpdate.getTotal());
+				}
 				if (requestUpdate.getDeliveryMode() != null) {
 					request.setDeliveryMode(requestUpdate.getDeliveryMode());
-				}
+				}				
 				if (requestUpdate.getUserId() != null) {
 					request.setUser(userService.findRawUserById(requestUpdate.getUserId()).get());
 				}
@@ -218,6 +221,8 @@ public class RequestService implements IRequestService {
 	public ResponseEntity<Void> reviewRequest(int id) {
 
 		try {
+			
+			
 
 			Optional<Request> optionalRequest = requestRepository.findById(id);
 
@@ -225,24 +230,28 @@ public class RequestService implements IRequestService {
 
 				Request underReviewRequest = optionalRequest.get();
 				Double underReviewTotal = underReviewRequest.getTotal();
+				
+				if (!underReviewRequest.getStatus().equals("PENDING")) {
+					return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+				}
 
-				if (underReviewRequest.getStatus().equals("PENDING")) {
-					if (underReviewTotal != 0 && underReviewTotal > 50) {
+				
+					if (underReviewTotal == 0) {
+						return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+					} 
+					else if (underReviewTotal >= 50) {
 						underReviewRequest.setStatus("REVIEW");
 						requestRepository.save(underReviewRequest);
 						return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-					} else if (underReviewTotal != 0 && underReviewTotal <= 50) {
+					} else if (underReviewTotal < 50) {
 						underReviewRequest.setStatus("APPROVED");
 						requestRepository.save(underReviewRequest);
 						return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-					} else if (underReviewTotal == 0) {
-						return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-					} else {
+					}
+					else {
 						return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 					}
-				} else {
-					return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-				}
+				
 
 			} else {
 				return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -256,10 +265,12 @@ public class RequestService implements IRequestService {
 
 	@Override
 	public ResponseEntity<Void> approveRequest(int id) {
-
+		LOGGER.warn("id: " + id);
 		try {
+			LOGGER.warn("id: " + id);
 
 			Optional<Request> optionalRequest = requestRepository.findById(id);
+			LOGGER.warn("id: " + id);
 
 			if (optionalRequest.isPresent()) {
 
@@ -267,6 +278,7 @@ public class RequestService implements IRequestService {
 
 				if (underReviewRequest.getStatus().equals("REVIEW")) {
 					underReviewRequest.setStatus("APPROVED");
+					LOGGER.warn("success??");
 					requestRepository.save(underReviewRequest);
 					return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 				} else {

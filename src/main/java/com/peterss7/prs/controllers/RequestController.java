@@ -31,7 +31,7 @@ import com.peterss7.prs.services.RequestService;
 import com.peterss7.prs.specifications.RequestSpecifications;
 
 @RestController
-@RequestMapping("/requests")
+@RequestMapping("/request")
 @CrossOrigin("http://localhost:4200")
 public class RequestController {
 
@@ -83,7 +83,7 @@ public class RequestController {
 
 	@PostMapping("")
 	public ResponseEntity<RequestNewResponse> createRequest(@RequestBody RequestNew newRequest) {
-
+		LOGGER.warn(newRequest.toString());
 		return requestService.createRequest(newRequest);
 
 	}
@@ -93,18 +93,6 @@ public class RequestController {
 
 		return requestService.updateRequest(requestUpdate);
 
-	}
-
-	@GetMapping("/requests-by-uid")
-	ResponseEntity<List<RequestDefaultResponse>> getRequestsByUserId(@RequestParam int userId) {
-		String urlOut = "http://localhost:8080/requests/requests-by-id?userId=" + userId;
-		LOGGER.warn(urlOut);
-		Integer intOut = null;
-		LocalDate date1 = null;
-		LocalDate date2 = null;
-		List<RequestDefaultResponse> requests = this.findAll("", date1, date2, "", intOut).getBody();
-		
-		return new ResponseEntity<List<RequestDefaultResponse>>(requests, HttpStatus.OK);
 	}
 
 	@DeleteMapping("/{id}")

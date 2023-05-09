@@ -217,17 +217,30 @@ public class UserService implements IUserService {
 
 	}
 
-	
-	public void deleteUserById(int id) {
-		/*
-		String url = "http://localhost:8080/requests?userId=" + id;
-        ResponseEntity<Request[]> response = restTemplate.getForEntity(url, Request[].class);
-        Request[] requests = response.getBody();
-        for (Request request : requests) {
-        	LOGGER.warn(request + "");
-        }
-        */
+	@Override
+	public ResponseEntity<String> deleteUserById(int id) {
 		
+		try {
+			
+			LOGGER.warn("in try");
+			LOGGER.warn("ID: " + id);
+			Optional<User> optionalUser = userRepository.findById(id);
+			
+			if (optionalUser.isPresent()) {
+				LOGGER.warn("in optional");	
+				User delUser = optionalUser.get();
+				
+				userRepository.delete(delUser);
+				return ResponseEntity.status(HttpStatus.NO_CONTENT).body("USER DELETED");
+			}
+			else {
+				LOGGER.warn("user not found");
+				return ResponseEntity.status(HttpStatus.NOT_FOUND).body("USER NOT FOUND");
+			}	
+		} catch (Exception e) {
+			LOGGER.warn("500");
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("ERROR ERROR ERROR NO BUENO"); 
+		}
 	
 	}
 

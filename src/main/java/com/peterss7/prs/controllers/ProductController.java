@@ -2,6 +2,8 @@ package com.peterss7.prs.controllers;
 
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -25,9 +27,11 @@ import com.peterss7.prs.services.ProductService;
 import com.peterss7.prs.specifications.ProductSpecifications;
 
 @RestController
-@RequestMapping("/products")
+@RequestMapping("/product")
 @CrossOrigin("http://localhost:4200")
 public class ProductController {
+	
+	private static final Logger LOGGER = LoggerFactory.getLogger(VendorController.class);
 
 	@Autowired
 	private ProductService productService;
@@ -82,6 +86,7 @@ public class ProductController {
 
 	@PutMapping("/{id}")
 	public ResponseEntity<String> updateProduct(@RequestBody ProductUpdate updatedProduct) {
+		LOGGER.warn("in product update");
 		return productService.updateProduct(updatedProduct);
 	}
 	

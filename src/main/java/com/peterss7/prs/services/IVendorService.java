@@ -12,7 +12,7 @@ import com.peterss7.prs.entities.Vendor;
 public interface IVendorService {
 
 	public abstract List<Vendor> findAllVendors();
-	public abstract Vendor findVendorById(int id);
+	public abstract ResponseEntity<Vendor> findVendorById(int id);
 	public abstract ResponseEntity<List<Vendor>> findVendorsByFields(
 		Specification<Vendor> spec);
 	public abstract Vendor createVendor(Vendor newVendor);

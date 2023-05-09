@@ -43,6 +43,32 @@ public class RequestLineService implements IRequestLineService {
 	public RequestLineService(RequestLineRepository requestLineRepository) {
 		this.requestLineRepository = requestLineRepository;
 	}
+	
+	
+	public List<RequestLine> findAll(){
+		
+		return requestLineRepository.findAll();
+		/*
+		try{
+			
+			
+			List<RequestLineDefaultResponse> responses = RequestLineDefaultResponse.getResponses(requestLines);
+			
+			
+			
+			if(requestLines.size() > 0) {
+				return new ResponseEntity<List<RequestLineDefaultResponse>>(responses, HttpStatus.OK);	
+			}
+			else {
+				return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);	
+			}	
+				
+		} catch(Exception e) {
+			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+		*/
+		
+	}
 
 	@Override
 	public ResponseEntity<RequestLineDefaultResponse> findRequestLineById(Integer id) {

@@ -174,11 +174,11 @@ public class UserController {
 		return userService.validateUserValues(searchTerm);
 	}
 
-	@PutMapping("/{id}")
-	@ResponseBody
+	@PutMapping("/{id}")	
 	public ResponseEntity<String> updateUser(@RequestBody User updatedUser) {
 
-		// LOGGER.warn("UserController updateUser put called.");
+		LOGGER.warn("UserController updateUser put called.");
+		LOGGER.warn(updatedUser.toString());
 
 		return userService.updateUser(updatedUser);
 	}
@@ -186,23 +186,7 @@ public class UserController {
 	@DeleteMapping("/{id}")
 	public ResponseEntity<String> deleteUserById(@PathVariable int id) {
 		LOGGER.warn("DELETING");
-		
-		/*
-		if (userService.deleteUserById(id)) {
-			return ResponseEntity.status(HttpStatus.NO_CONTENT).body("User deleted.");	
-		}
-		else {
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("User persists...");
-		}
-		*/
-		
-		return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("TESTING");
-		
-		
-			
-		
-		
-		
+		return userService.deleteUserById(id);
 	}
 	
 	public User createSearchTerm(String firstname, String lastname, String username, String email,
